@@ -1,0 +1,2 @@
+Pour builder : ocamlbuild test.native
+            ou ocamlbuild test.byte
