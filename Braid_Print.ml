@@ -12,7 +12,7 @@ let display b =
     let rec aux = function
         | [] -> print_newline ()
         | x::xs -> for l = 1 to 4 do
-                       for i = 0 to (x-1) do
+                       for i = 1 to (x-1) do
                         print_vert ()
                        done;
                        print_sigma (x>0) l;
