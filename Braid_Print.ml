@@ -31,27 +31,28 @@ let ratio = 10
 de hauteur h (coordonnées en bas à gauche de la tresse) *)
 let sigma_p x y h = let e = h/ratio in
                     let open Graphics in
-                    fill_poly [| (x, y+h); (x+e, y+h); (x+h, y); (x+h-e, y) |];
+                    fill_poly [| (x+h/2-e, y+h); (x+h/2, y+h); (x+h+h/2, y); (x+h-e+h/2, y) |];
                     set_color white;
-                    fill_poly [| (x, y+e); (x, y); (x+2*e, y); (x+h, y+h-e); (x+h, y+h); (x+h-2*e, y+h) |];
+                    fill_poly [| (x+h/2-e, y+e); (x+h/2-e, y); (x+h/2+e, y); (x+h+h/2, y+h-e); 
+                                 (x+h+h/2, y+h); (x+h+h/2-2*e, y+h) |];
                     set_color black;
-                    fill_poly [| (x, y); (x+e, y); (x+h, y+h); (x+h-e, y+h) |];;
+                    fill_poly [| (x+h/2-e, y); (x+h/2, y); (x+h+h/2, y+h); (x+h+h/2-e, y+h) |];;
                   
 
 (* Dessine le croisement sigma négatif à la position x,y
 de hauteur h (coordonnées en bas à gauche de la tresse) *)
 let sigma_n x y h = let e = h/ratio in
                     let open Graphics in
-                    fill_poly [| (x, y); (x + e, y); (x + h, y + h); (x + h - e, y + h) |];
+                    fill_poly [| (x+h/2-e, y); (x+h/2, y); (x+h+h/2, y + h); (x+h+h/2-e, y + h) |];
                     set_color white;
-                    fill_poly [| (x, y + h - e); (x, y+h); (x + 2*e, y+h); (x+h, y + e);
-                                 (x+h, y); (x+h - 2*e, y) |];
+                    fill_poly [| (x+h/2-e, y + h - e); (x+h/2-e, y+h); (x+h/2+e, y+h); (x+h+h/2, y + e);
+                                 (x+h+h/2, y); (x+h+h/2-2*e, y) |];
                     set_color black;
-                    fill_poly [| (x, y+h); (x+e, y+h); (x+h, y); (x+h-e, y) |]
+                    fill_poly [| (x+h/2-e, y+h); (x+h/2, y+h); (x+h+h/2, y); (x+h+h/2-e, y) |]
                     
 let vert x y h = let e = h/ratio in
                  let open Graphics in
-                 fill_poly [| (x+h/2-e/2, y); (x+h/2+e/2, y); (x+h/2+e/2, y+h); (x+h/2-e/2, y+h) |];;
+                 fill_poly [| (x+h/2-e, y); (x+h/2, y); (x+h/2, y+h); (x+h/2-e, y+h) |];;
 
 let display b =
     let size = b.size and height = List.length b.word in
@@ -62,7 +63,7 @@ let display b =
         | g::s -> for i = 0 to (g-2) do
                        vert (x + i*h) y h
                    done;
-                   (if g>0 then sigma_p else sigma_n) (x + ((g-1)*h) + (h/2)) y h;
+                   (if g>0 then sigma_p else sigma_n) (x + ((g-1)*h)) y h;
                    for i = g+1 to size do
                        vert (x + i*h) y h
                    done;
