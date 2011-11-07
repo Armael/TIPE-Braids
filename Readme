@@ -1,2 +1,2 @@
-Pour builder : ocamlbuild test.native
-            ou ocamlbuild test.byte
+Pour builder : ocamlbuild test.native -libs graphics
+            ou ocamlbuild test.byte -libs graphics
