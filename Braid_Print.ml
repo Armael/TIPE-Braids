@@ -48,7 +48,7 @@ let sigma_n x y h = let e = h/ratio in
                     fill_poly [| (x+h/2-e, y + h - e); (x+h/2-e, y+h); (x+h/2+e, y+h); (x+h+h/2, y + e);
                                  (x+h+h/2, y); (x+h+h/2-2*e, y) |];
                     set_color black;
-                    fill_poly [| (x+h/2-e, y+h); (x+h/2, y+h); (x+h+h/2, y); (x+h+h/2-e, y) |]
+                    fill_poly [| (x+h/2-e, y+h); (x+h/2, y+h); (x+h+h/2, y); (x+h+h/2-e, y) |];;
                     
 let vert x y h = let e = h/ratio in
                  let open Graphics in
@@ -60,11 +60,11 @@ let display b =
     Graphics.open_graph (" " ^ (string_of_int (h*size + 20)) ^ "x" ^ (string_of_int (h*height + 20)));
     let rec aux x y = function
         | [] -> ()
-        | g::s -> for i = 0 to (g-2) do
+        | g::s -> for i = 0 to ((abs g)-2) do
                        vert (x + i*h) y h
                    done;
-                   (if g>0 then sigma_p else sigma_n) (x + ((g-1)*h)) y h;
-                   for i = g+1 to size do
+                   (if g>0 then sigma_p else sigma_n) (x + (((abs g)-1)*h)) y h;
+                   for i = (abs g)+1 to size do
                        vert (x + i*h) y h
                    done;
                    aux x (y-h) s in
