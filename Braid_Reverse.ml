@@ -24,3 +24,12 @@ let split ?(trace = (fun _ -> ())) braid =
         p := passe (snd !p)
     done;
     {word = snd !p; size = braid.size};;
+
+let rev_splitted braid = 
+    let rev_w = List.map (fun x -> -x) (List.rev braid.word) in
+        {word = rev_w; size = braid.size};;
+
+let reduce ?(trace = (fun _ -> ())) braid = 
+    split ~trace:trace (rev_splitted (split ~trace:trace braid));;
+
+let is_nil braid = (reduce braid).word = [];;
