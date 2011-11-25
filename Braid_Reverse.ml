@@ -33,3 +33,5 @@ let reduce ?(trace = (fun _ -> ())) braid =
     split ~trace:trace (rev_splitted (split ~trace:trace braid));;
 
 let is_nil braid = (reduce braid).word = [];;
+
+let is_eq b1 b2 = is_nil (concat b1 (inv b2));;
