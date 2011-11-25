@@ -1,2 +1,4 @@
 Pour builder : ocamlbuild test.native -libs graphics
             ou ocamlbuild test.byte -libs graphics
+
+               ocamlbuild repl.byte -libs graphics -pp camlp4of
