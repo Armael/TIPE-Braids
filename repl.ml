@@ -1,7 +1,5 @@
 open Braid
 
-let list_max = List.fold_left (fun a x -> max a (abs x)) 0
-
 let rec parse_nombre = parser
     | [< ''-'; rest >] -> - (parse_nombre_positif 0 rest)
     | [< nombre = (parse_nombre_positif 0) >] -> nombre
@@ -20,7 +18,7 @@ let () =
         print_string "> ";
         let input = Stream.of_string (read_line () ^ ",") in
         let list = List.rev (parse [] input) in
-        Braid_Print.display {word = list; size = 1 + list_max list};
+        Braid_Print.display (make_braid list);
         Graphics.read_key ();
         Graphics.close_graph ();
     done

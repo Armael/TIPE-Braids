@@ -22,10 +22,10 @@ let ascii b =
                        print_newline ();
                    done;
                    aux xs in
-    aux b.word
+    aux b.word;;
 
 (* ratio hauteur du sigma / épaisseur des brins *)
-let ratio = 10
+let ratio = 10;;
 
 (* Dessine le croisement sigma positif à la position x,y
 de hauteur h (coordonnées en bas à gauche de la tresse) *)
@@ -68,4 +68,5 @@ let display b =
                        vert (x + i*h) y h
                    done;
                    aux x (y-h) s in
-     aux 10 ((height-1)*h+10) b.word
+     aux 10 ((height-1)*h+10) b.word;
+     Graphics.read_key (); ();;
