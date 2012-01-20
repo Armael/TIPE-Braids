@@ -34,4 +34,4 @@ let reduce ?(trace = (fun _ -> ())) braid =
 
 let is_nil braid = (reduce braid).word = [];;
 
-let is_eq b1 b2 = is_nil (concat b1 (inv b2));;
+let is_eq b1 b2 = is_nil (b1 ++ (inv b2));;
