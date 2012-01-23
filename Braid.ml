@@ -10,13 +10,3 @@ let make_braid ?(size = -1) w =
     let s = (if size = -1 then 1 + List.fold_left (fun a x -> max a (abs x)) 0 w
                           else size) in
     {word = w; size = s};;
-
-let braid_to_permut b =
-    let permut = Permutation.make_id b.size in
-    List.iter (fun x -> Permutation.transpose permut ((abs x)-1) (abs x)) b.word;
-    permut;;
-
-let starting_set b = List.map ((+) 1) (Permutation.consecutive_inversions (braid_to_permut b));;
-let finishing_set b = starting_set (inv b);;
-
-

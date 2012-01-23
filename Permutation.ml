@@ -3,6 +3,8 @@ let transpose permut i j =
     permut.(i) <- permut.(j);
     permut.(j) <- temp;;
 
+(* La fonction renvoie une liste _triée_
+   des inversions *)
 let consecutive_inversions permut =
     let n = Array.length permut in
     if n <= 1 then [] else (
@@ -21,6 +23,13 @@ let make_id n =
     done;
     id;;
 
+let make_delta n =
+    let delta = Array.make n 0 in
+    for i = 0 to n-1 do
+        delta.(i) <- n-1-i
+    done;
+    delta;;
+
 let inv permut =
     let n = Array.length permut in
     let inv = Array.make n 0 in
@@ -38,3 +47,33 @@ let compose p1 p2 =
     c;;
 
 let (<*>) = compose;;
+
+(* Conjugué par Delta;
+tau(sigma_i) = sigma_(n-i) *)
+let tau p =
+    let n = Array.length p in 
+    let q = Array.make n 0 in
+    for i = 0 to n - 1 do
+        q.(n-1-i) <- n-1-p.(i)
+    done;
+    q;;
+
+let braid_to_permut (b : Braid.braid) =
+    let permut = make_id b.size in
+    List.iter (fun x -> transpose permut ((abs x)-1) (abs x)) b.word;
+    permut;;
+
+(* Les listes retournées sont triées pour les deux fonctions ci-dessous *)
+let starting_set p = List.map ((+) 1) (consecutive_inversions p);;
+(* On a bien S(inv de permutation) = F(permutation) à la place d'utiliser
+le rev de la tresse correspondante *)
+let finishing_set p = starting_set (inv p);;
+
+(* Les listes doivent être triées *)
+let rec is_subset e f = match (e, f) with
+    | ([], _) -> true
+    | (_, []) -> false
+    | (x::xs, y::ys) -> if x < y then false
+                        else if x = y then is_subset xs ys
+                             else is_subset xs (y::ys);; 
+
