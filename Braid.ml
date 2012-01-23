@@ -12,11 +12,11 @@ let make_braid ?(size = -1) w =
     {word = w; size = s};;
 
 let braid_to_permut b =
-    let permut = Permutations.make_id b.size in
-    List.iter (fun x -> Permutations.transpose permut ((abs x)-1) (abs x)) b.word;
+    let permut = Permutation.make_id b.size in
+    List.iter (fun x -> Permutation.transpose permut ((abs x)-1) (abs x)) b.word;
     permut;;
 
-let starting_set b = List.map ((+) 1) (Permutations.consecutive_inversions (braid_to_permut b));;
+let starting_set b = List.map ((+) 1) (Permutation.consecutive_inversions (braid_to_permut b));;
 let finishing_set b = starting_set (inv b);;
 
 
