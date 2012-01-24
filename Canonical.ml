@@ -47,3 +47,4 @@ let canonicize bpl =
 
 let canonical_form b = canonicize (get_permlist_decomposition b);;
 
+let equality_test b1 b2 = (canonical_form b1) = (canonical_form b2);;
