@@ -23,12 +23,22 @@ let make_id n =
     done;
     id;;
 
+let make_transpose i j n = transpose (make_id n) i j;;
+
 let make_delta n =
     let delta = Array.make n 0 in
     for i = 0 to n-1 do
         delta.(i) <- n-1-i
     done;
     delta;;
+
+let is_delta p =
+  let n = Array.length p in
+  let ok = ref true and i = ref 0 in
+  while !ok && !i < n do
+    ok := (p.(i) = n-1-i)
+  done;
+  !ok;;
 
 let inv permut =
     let n = Array.length permut in
@@ -75,5 +85,12 @@ let rec is_subset e f = match (e, f) with
     | (_, []) -> false
     | (x::xs, y::ys) -> if x < y then false
                         else if x = y then is_subset xs ys
-                             else is_subset xs (y::ys);; 
+                             else is_subset (x::xs) ys;; 
+
+let rec set_difference e f = match (e, f) with
+    | ([], _) -> []
+    | (_, []) -> e
+    | (x::xs, y::ys) -> if x < y then x::(set_difference xs (y::ys))
+                        else if x = y then set_difference xs ys
+                             else set_difference (x::xs) ys;; 
 
