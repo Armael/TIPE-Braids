@@ -73,7 +73,7 @@ let inverse b =
 let random_braid_sequence n l =
   let rec loop acc = function
     | 0 -> acc
-    | i -> loop (random_permutation n :: acc) (i-1)
+    | i -> loop (P.random_permutation n :: acc) (i-1)
   in
   {delta_power = l-(Random.int (3*l)); (* tout à fait arbitraire *)
    permlist = loop [] l};;
