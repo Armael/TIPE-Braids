@@ -1,7 +1,9 @@
+type permutation = int array;;
+
 let transpose permut i j =
     let tmp = permut.(i) in
     permut.(i) <- permut.(j);
-    permut.(j) <- temp;;
+    permut.(j) <- tmp;;
 
 (* La fonction renvoie une liste _triée_
    des inversions *)
@@ -23,7 +25,10 @@ let make_id n =
     done;
     id;;
 
-let make_transpose i j n = transpose (make_id n) i j;;
+let make_transpose i j n =
+    let t = make_id n in
+    transpose t i j;
+    t;;
 
 let make_delta n =
     let delta = Array.make n 0 in
@@ -36,7 +41,8 @@ let is_delta p =
   let n = Array.length p in
   let ok = ref true and i = ref 0 in
   while !ok && !i < n do
-    ok := (p.(i) = n-1-i)
+    ok := (p.(!i) = n - 1 - !i);
+    i := !i+1
   done;
   !ok;;
 
@@ -56,21 +62,19 @@ let compose p1 p2 =
     done;
     c;;
 
-let (<*>) = compose;;
-
 (* Conjugué par Delta;
 tau(sigma_i) = sigma_(n-i) *)
 let tau p =
     let n = Array.length p in 
     let q = Array.make n 0 in
-    for i = 0 to n - 1 do
+    for i = 0 to n - 1 do
         q.(n-1-i) <- n-1-p.(i)
     done;
     q;;
 
 let braid_to_permut (b : Braid.braid) =
-    let permut = make_id b.size in
-    List.iter (fun x -> transpose permut ((abs x)-1) (abs x)) b.word;
+    let permut = make_id b.Braid.size in
+    List.iter (fun x -> transpose permut ((abs x)-1) (abs x)) b.Braid.word;
     permut;;
 
 (* Les listes retournées sont triées pour les deux fonctions ci-dessous *)
@@ -112,4 +116,4 @@ let shuffle t =
   t;;
 
 let random_permutation n = shuffle (make_id n);;
-  
+

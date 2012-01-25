@@ -3,20 +3,23 @@ module P = Permutation;;
 type braid_permlist = {delta_power : int; permlist : P.permutation list};;
 
 (* Convert a braid word to a permlist *)
-let get_permlist_decomposition b = 
-    let n = b.size in
-    let neg_to_perm x = 
-        P.transpose (make_delta n) (-x-1) (-x) in (* x négatif *)
+let get_permlist_decomposition (b : Braid.braid) = 
+    let n = b.Braid.size in
+    (* Calcule Delta * sigma^-1 que l'on sait être un facteur canonique *)
+    let neg_to_perm x =
+        let perm = P.make_delta n in
+        P.transpose perm (-x-1) (-x); (* x négatif *)
+        perm in
     let (delta_pow, perm_stack) = 
         List.fold_left (fun (delta_pow, perm_stack) x ->
                           if x > 0 then
                             (delta_pow, 
-                            (P.make_transpose (x-1), 0)::perm_stack)
+                            (P.make_transpose (x-1) x n, 0)::perm_stack)
                           else
                             (delta_pow - 1,
                              (neg_to_perm x, 0)::
-                             (List.map (fun (p, tau_pow) -> (p, tau_pow + 1)) perm_stack))
-                       ([], 0) b.word in
+                             (List.map (fun (p, tau_pow) -> (p, tau_pow + 1)) perm_stack)))
+                       (0, []) b.Braid.word in
     let perm_list =
         List.rev_map (fun (perm, tau_pow) -> if (tau_pow mod 2) = 1
                                                 then P.tau perm
@@ -29,9 +32,10 @@ let get_permlist_decomposition b =
 let rec make_left_weighted = function
   | p1::p2::q -> (match P.set_difference (P.starting_set p2) (P.finishing_set p1) with
                    | [] -> p1::make_left_weighted (p2::q)
-		   | i::_ -> let p1' = P.transpose p1 (i-1) i
-			     and p2' = P.compose p2 (P.make_transpose (i-1)) in
-		             make_left_weighted (p1'::p2':q))
+		           | i::_ -> let p1' = Array.copy p1 in
+		                     P.transpose p1' (i-1) i;
+			                 let p2' = P.compose p2 (P.make_transpose (i-1) i (Array.length p2)) in
+		                     make_left_weighted (p1'::p2'::q))
   | pl -> pl;;
   
 let canonicize bpl =
@@ -39,9 +43,9 @@ let canonicize bpl =
   and pl = ref (make_left_weighted bpl.permlist)
   and ok = ref false in
   while not !ok && !pl <> [] do
-    if P.is_delta (hd !pl) then (
-      dp := dp + 1;
-      pl := tl !pl
+    if P.is_delta (List.hd !pl) then (
+      dp := !dp + 1;
+      pl := List.tl !pl
     ) else (
       ok := true
     )
@@ -58,16 +62,23 @@ let compare_permlists bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 
 let product a b =
   {delta_power = a.delta_power + b.delta_power;
-   permlist = (if a.delta_power mod 2 = 1 then tau a.permlist else a.permlist)
+   permlist = (if a.delta_power mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
               @ b.permlist };;
 
-let inverse b =
-  {delta_power = -b.delta_power - List.length b.permlist;
-   permlist = List.fold_left (fun (parity, acc) perm ->
-				((parity + 1) mod 2,
-				 (if parity = 0 then perm::acc else (P.tau perm)::acc)))
-                             ((q+l) mod 2, []) b.permlist };;
+let (<*>) = product;;
 
+let inverse b = 
+    let l = List.length b.permlist and q = b.delta_power in
+   {
+    delta_power = - q - l;
+    permlist = snd (List.fold_left (fun (parity, acc) perm ->
+                                      ((parity + 1) mod 2,
+                                       (if parity = 0 then perm::acc else (P.tau perm)::acc)))
+                                   ((q + l) mod 2, []) b.permlist)
+   };;
+
+
+let conjugate a b = b <*> a <*> (inverse b);;
 
 (* Appeler avec l = DOUZE, n de l'ordre de 10^(1 ou 2) *)
 let random_braid_sequence n l =
