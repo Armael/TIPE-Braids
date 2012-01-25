@@ -67,3 +67,13 @@ let inverse b =
 				((parity + 1) mod 2,
 				 (if parity = 0 then perm::acc else (P.tau perm)::acc)))
                              ((q+l) mod 2, []) b.permlist };;
+
+
+(* Appeler avec l = DOUZE, n de l'ordre de 10^(1 ou 2) *)
+let random_braid_sequence n l =
+  let rec loop acc = function
+    | 0 -> acc
+    | i -> loop (random_permutation n :: acc) (i-1)
+  in
+  {delta_power = l-(Random.int (3*l)); (* tout à fait arbitraire *)
+   permlist = loop [] l};;

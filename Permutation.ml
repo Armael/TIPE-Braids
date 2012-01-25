@@ -94,3 +94,22 @@ let rec set_difference e f = match (e, f) with
                         else if x = y then set_difference xs ys
                              else set_difference (x::xs) ys;; 
 
+
+(* Mélange aléatoire d'un tableau avec l'algo de Knuth-Fisher-Yates,
+   appliqué à la génération d'une permutation aléatoire *)
+
+(* mélange sur place, modifie le tableau *)
+let shuffle t =
+  Random.self_init ();
+  let swap i j = let temp = t.(i) in
+                 t.(i) <- t.(j);
+		 t.(j) <- temp
+  in
+  let n = Array.length t in
+  for i = n-1 downto 0 do
+    swap i (Random.int (i+1));
+  done;
+  t;;
+
+let random_permutation n = shuffle (make_id n);;
+  
