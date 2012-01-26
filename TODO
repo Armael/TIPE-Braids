@@ -1,9 +1,9 @@
 -> Finir d'implémenter l'algo de mise sous forme canonique avec une méthode hybride :
     découpage initial en facteurs canoniques en s'arrêtant dès le premier double croisement
     application de l'algorithme pour obtenir une décomposition maximale à gauche
-
--> Implémenter les opérations sur le groupe avec les formes canoniques
--> Implémenter un cryptosystème à la Diffie-Helman
+    Statut : on a fait plus simple (mais moins efficace)
+-> Implémenter les opérations sur le groupe avec les formes canoniques : OK
+-> Implémenter un cryptosystème à la Diffie-Helman : ne marche pas :-(
 -> Implémenter un cryptosystème à la Anshel-Anshel-Goldfeld
 -> Comprendre l'attaque du papier 35
 -> L'implémenter

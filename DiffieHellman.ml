@@ -22,4 +22,5 @@ let () =
     let tA = make_key bob_exch alice_priv in
     let tB = make_key alice_exch bob_priv in
 
-    if compare_permlists tA tB then print_string "Ok" else print_string "Pas ok";;
+    print_string (if compare_permlists tA tB then "Ok" else "Pas ok");
+    print_newline ();;
