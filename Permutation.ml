@@ -117,3 +117,10 @@ let shuffle t =
 
 let random_permutation n = shuffle (make_id n);;
 
+let print_permutation p =
+  print_string "[";
+  print_int p.(0);
+  for i=1 to Array.length p - 1 do
+    Printf.printf " %d" p.(i);
+  done;
+  print_string "]";;

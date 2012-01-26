@@ -30,12 +30,18 @@ let get_permlist_decomposition (b : Braid.braid) =
 (* Conversion functions to left-weighted/canonical/normal form *)
 
 let rec make_left_weighted = function
-  | p1::p2::q -> (match P.set_difference (P.starting_set p2) (P.finishing_set p1) with
-                   | [] -> p1::make_left_weighted (p2::q)
-		           | i::_ -> let p1' = Array.copy p1 in
-		                     P.transpose p1' (i-1) i;
-			                 let p2' = P.compose p2 (P.make_transpose (i-1) i (Array.length p2)) in
-		                     make_left_weighted (p1'::p2'::q))
+  | p1::p2::q ->
+      let s2 = P.starting_set p2 and f1 = P.finishing_set p1 in
+        if s2 = [] (* p2 = neutre *) then make_left_weighted (p1::q)
+        else if f1 = [] (* p1 = e *) then make_left_weighted (p2::q)
+        else (
+          match P.set_difference s2 f1 with
+            | [] -> p1::make_left_weighted (p2::q)
+            | i::_ -> let p1' = Array.copy p1 in
+                      P.transpose p1' (i-1) i;
+                      let p2' = P.compose p2 (P.make_transpose (i-1) i (Array.length p2)) in
+                      make_left_weighted (p1'::p2'::q)
+        )
   | pl -> pl;;
   
 let canonicize bpl =
@@ -68,14 +74,14 @@ let product a b =
 let (<*>) = product;;
 
 let inverse b = 
-    let l = List.length b.permlist and q = b.delta_power in
-   {
+  let l = List.length b.permlist and q = b.delta_power in
+  {
     delta_power = - q - l;
     permlist = snd (List.fold_left (fun (parity, acc) perm ->
                                       ((parity + 1) mod 2,
                                        (if parity = 0 then perm::acc else (P.tau perm)::acc)))
-                                   ((q + l) mod 2, []) b.permlist)
-   };;
+                                    ((q + l) mod 2, []) b.permlist)
+  };;
 
 
 let conjugate a b = b <*> a <*> (inverse b);;
@@ -88,3 +94,8 @@ let random_braid_sequence n l =
   in
   {delta_power = l-(Random.int (3*l)); (* tout à fait arbitraire *)
    permlist = loop [] l};;
+
+let print_braid_permlist bpl =
+  Printf.printf "(%d | " bpl.delta_power;
+  List.iter (fun p -> P.print_permutation p; print_string " ") bpl.permlist;
+  print_string ")";;
