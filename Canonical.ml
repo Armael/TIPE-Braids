@@ -102,14 +102,17 @@ let product a b =
 
 let (<*>) = product;;
 
-let inverse b = 
+let inverse b =
   let l = List.length b.permlist and q = b.delta_power in
+  let (_, pl') =
+    List.fold_left (fun (parity, acc) p ->
+                      let p' = P.compose (P.make_delta (Array.length p)) (P.inv p) in
+                      ((parity + 1) mod 2,
+                       (if parity = 0 then p'::acc else (P.tau p')::acc)))
+                   ((q + l) mod 2, []) b.permlist in
   {
     delta_power = - q - l;
-    permlist = snd (List.fold_left (fun (parity, acc) perm ->
-                                      ((parity + 1) mod 2,
-                                       (if parity = 0 then perm::acc else (P.tau perm)::acc)))
-                                    ((q + l) mod 2, []) b.permlist)
+    permlist = pl'
   };;
 
 
