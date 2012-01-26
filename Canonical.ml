@@ -29,6 +29,7 @@ let get_permlist_decomposition (b : Braid.braid) =
 
 (* Conversion functions to left-weighted/canonical/normal form *)
 
+(*
 let rec make_left_weighted = function
   | p1::p2::q ->
       let s2 = P.starting_set p2 and f1 = P.finishing_set p1 in
@@ -37,13 +38,41 @@ let rec make_left_weighted = function
         else (
           match P.set_difference s2 f1 with
             | [] -> p1::make_left_weighted (p2::q)
-            | i::_ -> let p1' = Array.copy p1 in
-                      P.transpose p1' (i-1) i;
-                      let p2' = P.compose p2 (P.make_transpose (i-1) i (Array.length p2)) in
+            | i::_ -> let p1' = P.compose (P.make_transpose (i-1) i (Array.length p1)) p1 in
+                      let p2' = Array.copy p2 in P.transpose p2' (i-1) i;
                       make_left_weighted (p1'::p2'::q)
         )
   | pl -> pl;;
-  
+*)
+
+let make_left_weighted start_pl =
+  let continue = ref true in (* référence mis à true à chaque fois que iter provoque une
+                                modification de la permlist manipulée *)
+  let rec iter = function (* 1 itération effectuant des modifications / simplifications
+                             dans la liste sans reculer *)
+    | []        -> []
+    | [p]       -> if P.is_id p then [] else [p]
+    | p1::p2::q ->
+        let s2 = P.starting_set p2 and f1 = P.finishing_set p1 in
+          if      s2 = [] (* p2 = id *) then ( continue := true; iter (p1::q) )
+          else if f1 = [] (* p1 = id *) then ( continue := true; iter (p2::q) )
+          else (
+            match P.set_difference s2 f1 with
+              | [] -> p1::iter (p2::q) (* rien à modifier ici, on va plus loin *)
+              | i::_ -> 
+                  continue := true;
+                  let p1' = P.compose (P.make_transpose (i-1) i (Array.length p1)) p1 in
+                  let p2' = Array.copy p2 in P.transpose p2' (i-1) i;
+                  iter (p1'::p2'::q)
+          )
+  in
+  let current_pl = ref start_pl in
+  while !continue do
+    continue := false;
+    current_pl := iter !current_pl;
+  done;
+  !current_pl;;
+
 let canonicize bpl =
   let dp = ref bpl.delta_power 
   and pl = ref (make_left_weighted bpl.permlist)

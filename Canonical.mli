@@ -15,3 +15,4 @@ val conjugate : braid_permlist -> braid_permlist -> braid_permlist;;
 
 val random_braid_sequence : int -> int -> braid_permlist;;
 
+val print_braid_permlist : braid_permlist -> unit;;

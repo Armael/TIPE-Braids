@@ -25,6 +25,15 @@ let make_id n =
     done;
     id;;
 
+let is_id p =
+  let n = Array.length p in
+  let ok = ref true and i = ref 0 in
+  while !ok && !i < n do
+    ok := (p.(!i) = !i);
+    i := !i+1
+  done;
+  !ok;;
+
 let make_transpose i j n =
     let t = make_id n in
     transpose t i j;
@@ -72,6 +81,7 @@ let tau p =
     done;
     q;;
 
+(* pas sûr que ça soit juste ... *)
 let braid_to_permut (b : Braid.braid) =
     let permut = make_id b.Braid.size in
     List.iter (fun x -> transpose permut ((abs x)-1) (abs x)) b.Braid.word;
