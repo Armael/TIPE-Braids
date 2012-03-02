@@ -45,8 +45,8 @@ let make_left_weighted start_pl =
               | [] -> p1::iter (p2::q) (* rien à modifier ici, on va plus loin *)
               | i::_ -> 
                   continue := true;
-                  let p1' = P.compose (P.make_transpose (i-1) i (Array.length p1)) p1 in
-                  let p2' = Array.copy p2 in P.transpose p2' (i-1) i;
+                  let p1' = P.compose_transpose_left  p1 (i-1) i in
+                  let p2' = P.compose_transpose_right p2 (i-1) i in
                   iter (p1'::p2'::q)
           )
   in
@@ -81,19 +81,20 @@ let compare_permlists bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 
 let product a b =
   {delta_power = a.delta_power + b.delta_power;
-   permlist = (if a.delta_power mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
+   permlist = (if b.delta_power mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
               @ b.permlist };;
 
 let (<*>) = product;;
 
 let inverse b =
   let l = List.length b.permlist and q = b.delta_power in
+  let delta = P.make_delta (Array.length (List.hd b.permlist)) in
   let (_, pl') =
     List.fold_left (fun (parity, acc) p ->
-                      let p' = P.compose (P.make_delta (Array.length p)) (P.inv p) in
-                      ((parity + 1) mod 2,
+                      let p' = P.compose (P.inv p) delta in
+                      (1 - parity,
                        (if parity = 0 then p'::acc else (P.tau p')::acc)))
-                   ((q + l) mod 2, []) b.permlist in
+                   (q mod 2, []) b.permlist in
   {
     delta_power = - q - l;
     permlist = pl'

@@ -81,6 +81,25 @@ let tau p =
     done;
     q;;
 
+(* Pour diminuer le nombre d'allocations liées à la composition
+   d'une permutation par une transposition *)
+let compose_transpose_left permut i j =
+  let n = Array.length permut in
+  let res = Array.make n 0 in
+  for k=0 to n-1 do
+    let pk = permut.(k) in
+    res.(k) <- (if      pk = i then j 
+                else if pk = j then i
+                else                pk)
+  done;
+  res;;
+
+let compose_transpose_right permut i j =
+  let res = Array.copy permut in
+  transpose res i j;
+  res;;
+
+
 (* pas sûr que ça soit juste ... *)
 let braid_to_permut (b : Braid.braid) =
     let permut = make_id b.Braid.size in

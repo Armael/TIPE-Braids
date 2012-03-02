@@ -10,6 +10,8 @@ val is_delta : permutation -> bool;;
 val inv : permutation -> permutation;;
 val compose : permutation -> permutation -> permutation;;
 val tau : permutation -> permutation;;
+val compose_transpose_left : permutation -> int -> int -> permutation;;
+val compose_transpose_right : permutation -> int -> int -> permutation;;
 val braid_to_permut : Braid.braid -> permutation;;
 val starting_set : permutation -> int list;;
 val finishing_set : permutation -> int list;;
