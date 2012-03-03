@@ -92,9 +92,9 @@ let inverse b =
   let (_, pl') =
     List.fold_left (fun (parity, acc) p ->
                       let p' = P.compose (P.inv p) delta in
-                      (1 - parity,
+                      ((parity + 1) mod 2,
                        (if parity = 0 then p'::acc else (P.tau p')::acc)))
-                   (q mod 2, []) b.permlist in
+                   ((abs q) mod 2, []) b.permlist in
   {
     delta_power = - q - l;
     permlist = pl'
