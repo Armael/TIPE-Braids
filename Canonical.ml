@@ -6,10 +6,8 @@ type braid_permlist = {delta_power : int; permlist : P.permutation list};;
 let get_permlist_decomposition (b : Braid.braid) = 
     let n = b.Braid.size in
     (* Calcule Delta * sigma^-1 que l'on sait être un facteur canonique *)
-    let neg_to_perm x =
-        let perm = P.make_delta n in
-        P.transpose perm (-x-1) (-x); (* x négatif *)
-        perm in
+    let delta = P.make_delta n in
+    let neg_to_perm x = P.compose_transpose_left delta (-x-1) (-x) in
     let (delta_pow, perm_stack) = 
         List.fold_left (fun (delta_pow, perm_stack) x ->
                           if x > 0 then
@@ -101,7 +99,7 @@ let inverse b =
   };;
 
 
-let conjugate a b = b <*> a <*> (inverse b);;
+let conjugate a b = (b <*> a) <*> (inverse b);;
 
 (* Appeler avec l = DOUZE, n de l'ordre de 10^(1 ou 2) *)
 let random_braid_sequence n l =
