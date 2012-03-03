@@ -72,8 +72,8 @@ let canonicize bpl =
 let canonical_form b = canonicize (get_permlist_decomposition b);;
 
 (* Equality tests *)
-let compare_braids b1 b2 = (canonical_form b1) = (canonical_form b2);;
-let compare_permlists bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
+let braids_equal b1 b2 = (canonical_form b1) = (canonical_form b2);;
+let permlists_equal bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 
 (* Algebraic operations on permlists *)
 

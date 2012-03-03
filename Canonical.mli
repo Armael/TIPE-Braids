@@ -5,8 +5,8 @@ val get_permlist_decomposition : braid -> braid_permlist;;
 val make_left_weighted : Permutation.permutation list -> Permutation.permutation list;;
 val canonicize : braid_permlist -> braid_permlist;;
 val canonical_form : braid -> braid_permlist;;
-val compare_braids : braid -> braid -> bool;;
-val compare_permlists : braid_permlist -> braid_permlist -> bool;;
+val braids_equal : braid -> braid -> bool;;
+val permlists_equal : braid_permlist -> braid_permlist -> bool;;
 
 val product : braid_permlist -> braid_permlist -> braid_permlist;;
 val (<*>) : braid_permlist -> braid_permlist -> braid_permlist;;
