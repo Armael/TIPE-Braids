@@ -10,7 +10,7 @@ let get_permlist_decomposition (b : Braid.braid) =
         let perm = P.make_delta n in
         P.transpose perm (-x-1) (-x); (* x négatif *)
         perm in
-    let (delta_pow, perm_stack) = 
+    let (delta_pow, perm_stack) =
         List.fold_left (fun (delta_pow, perm_stack) x ->
                           if x > 0 then
                             (delta_pow, 
@@ -43,10 +43,13 @@ let make_left_weighted start_pl =
           else (
             match P.set_difference s2 f1 with
               | [] -> p1::iter (p2::q) (* rien à modifier ici, on va plus loin *)
-              | i::_ -> 
+              | l -> 
                   continue := true;
-                  let p1' = P.compose (P.make_transpose (i-1) i (Array.length p1)) p1 in
-                  let p2' = Array.copy p2 in P.transpose p2' (i-1) i;
+                  let n = Array.length p1 in
+                  let fact_permut = P.make_id n in
+                  List.iter (fun i -> P.transpose fact_permut (i-1) i) l;
+                  let p1' = P.compose fact_permut p1 and
+                      p2' = P.compose p2 (P.inv fact_permut) in
                   iter (p1'::p2'::q)
           )
   in
