@@ -76,7 +76,7 @@ let make_left_weighted start_pl =
           else (
             match P.set_difference s2 f1 with
               | [] -> p1::iter (p2::q) (* rien à modifier ici, on va plus loin *)
-              | l -> 
+              | i::_ -> 
                   continue := true;
                   let p1' = P.compose_transpose_left  p1 (i-1) i in
                   let p2' = P.compose_transpose_right p2 (i-1) i in
@@ -116,7 +116,6 @@ let canonicize bpl =
 
 let canonical_form b = canonicize (get_permlist_decomposition b);;
 
-<<<<<<< HEAD
 (*s Tests d'égalité.
 
    Revient à mettre sous forme canonique, et les comparer.
