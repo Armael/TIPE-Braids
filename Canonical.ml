@@ -116,7 +116,6 @@ let canonicize bpl =
 
 let canonical_form b = canonicize (get_permlist_decomposition b);;
 
-<<<<<<< HEAD
 (*s Tests d'égalité.
 
    Revient à mettre sous forme canonique, et les comparer.
