@@ -81,7 +81,7 @@ let compare_permlists bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 
 let product a b =
   {delta_power = a.delta_power + b.delta_power;
-   permlist = (if b.delta_power mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
+   permlist = (if (abs b.delta_power) mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
               @ b.permlist };;
 
 let (<*>) = product;;
