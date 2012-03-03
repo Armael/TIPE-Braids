@@ -19,11 +19,11 @@ let random_braid n l =
     done;
     {word = !w; size = n};;
 
-let random_LBn_braid n l =
+let random_lower_braid n l =
     let b = random_braid (n/2-1) l in
-        {word = b.word; size = n};;
+      {word = b.word; size = n};;
 
-let random_UBn_braid n l =
+let random_upper_braid n l =
     Random.self_init ();
     let w = ref [] in
     for i = 0 to l-1 do

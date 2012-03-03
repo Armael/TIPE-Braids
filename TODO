@@ -3,8 +3,11 @@
     application de l'algorithme pour obtenir une décomposition maximale à gauche
     Statut : on a fait plus simple (mais moins efficace)
 -> Implémenter les opérations sur le groupe avec les formes canoniques : OK
--> Implémenter un cryptosystème à la Diffie-Helman : ne marche pas :-(
--> Implémenter un cryptosystème à la Anshel-Anshel-Goldfeld
+-> Implémenter un cryptosystème à la Diffie-Helman :
+   * simulation des fonctionnalités de base (génération des clés et calcul de la clé secrète commune) :
+     STATUS : DONE
+   * implémentation pratique ? à faire peut-être
+-> Implémenter un cryptosystème à la Anshel-Anshel-Goldfeld : à faire
 -> Comprendre l'attaque du papier 35
 -> L'implémenter
 -> Comprendre les limites de l'attaque (génération plus judicieuse des tresses aléatoires...)

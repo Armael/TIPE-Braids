@@ -31,12 +31,10 @@ type braid_permlist = {delta_power : int; permlist : P.permutation list};;
 let get_permlist_decomposition (b : Braid.braid) = 
     let n = b.Braid.size in
     (* Calcule $\Delta \times \sigma^{-1}$ que l'on sait être un facteur canonique *)
-    let neg_to_perm x =
-        let perm = P.make_delta n in
-        P.transpose perm (-x-1) (-x); (* $x$ négatif *)
-        perm in
+    let delta = P.make_delta n in
+    let neg_to_perm x = P.compose_transpose_left delta (-x-1) (-x) in
     (* Applique l'algorithme, en mémorisant la puissance de $\tau$ à appliquer *)
-    let (delta_pow, perm_stack) =
+    let (delta_pow, perm_stack) = 
         List.fold_left (fun (delta_pow, perm_stack) x ->
                           if x > 0 then
                             (delta_pow, 
@@ -80,11 +78,8 @@ let make_left_weighted start_pl =
               | [] -> p1::iter (p2::q) (* rien à modifier ici, on va plus loin *)
               | l -> 
                   continue := true;
-                  let n = Array.length p1 in
-                  let fact_permut = P.make_id n in
-                  List.iter (fun i -> P.transpose fact_permut (i-1) i) l;
-                  let p1' = P.compose fact_permut p1 and
-                      p2' = P.compose p2 (P.inv fact_permut) in
+                  let p1' = P.compose_transpose_left  p1 (i-1) i in
+                  let p2' = P.compose_transpose_right p2 (i-1) i in
                   iter (p1'::p2'::q)
           )
   in
@@ -121,13 +116,14 @@ let canonicize bpl =
 
 let canonical_form b = canonicize (get_permlist_decomposition b);;
 
+<<<<<<< HEAD
 (*s Tests d'égalité.
 
    Revient à mettre sous forme canonique, et les comparer.
 *)
 
-let compare_braids b1 b2 = (canonical_form b1) = (canonical_form b2);;
-let compare_permlists bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
+let braids_equal b1 b2 = (canonical_form b1) = (canonical_form b2);;
+let permlists_equal bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 
 (*s Opérations algébriques sur les tresses sous forme de listes de permutations.
 *)
@@ -140,7 +136,7 @@ let compare_permlists bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 
 let product a b =
   {delta_power = a.delta_power + b.delta_power;
-   permlist = (if a.delta_power mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
+   permlist = (if (abs b.delta_power) mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
               @ b.permlist };;
 
 let (<*>) = product;;
@@ -155,12 +151,13 @@ let (<*>) = product;;
    
 let inverse b =
   let l = List.length b.permlist and q = b.delta_power in
+  let delta = P.make_delta (Array.length (List.hd b.permlist)) in
   let (_, pl') =
     List.fold_left (fun (parity, acc) p ->
-                      let p' = P.compose (P.make_delta (Array.length p)) (P.inv p) in
+                      let p' = P.compose (P.inv p) delta in
                       ((parity + 1) mod 2,
                        (if parity = 0 then p'::acc else (P.tau p')::acc)))
-                   ((q + l) mod 2, []) b.permlist in
+                   ((abs q) mod 2, []) b.permlist in
   {
     delta_power = - q - l;
     permlist = pl'
@@ -171,7 +168,7 @@ let inverse b =
    Conjugué de A par B : $B A B^{-1}$
 *)
 
-let conjugate a b = b <*> a <*> (inverse b);;
+let conjugate a b = (b <*> a) <*> (inverse b);;
 
 (*s Génère une tresse sous forme de liste de permutations aléatoire.
    À appeler avec l = DOUZE, n de l'ordre de 80 (en gros, $10^{1\ ou \ 2}$)
