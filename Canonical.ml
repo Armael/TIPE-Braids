@@ -46,7 +46,7 @@ let get_permlist_decomposition (b : Braid.braid) =
                        (0, []) b.Braid.word in
     (* On applique la puissance de $\tau$ si nécessaire *)
     let perm_list =
-        List.rev_map (fun (perm, tau_pow) -> if (tau_pow mod 2) = 1
+        List.rev_map (fun (perm, tau_pow) -> if (tau_pow mod 2) <> 0
                                                 then P.tau perm
                                                 else perm)
                      perm_stack in
@@ -135,7 +135,7 @@ let permlists_equal bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 
 let product a b =
   {delta_power = a.delta_power + b.delta_power;
-   permlist = (if (abs b.delta_power) mod 2 = 1 then List.map P.tau a.permlist else a.permlist)
+   permlist = (if b.delta_power mod 2 <> 0 then List.map P.tau a.permlist else a.permlist)
               @ b.permlist };;
 
 let (<*>) = product;;
