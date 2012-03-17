@@ -1,4 +1,3 @@
-
 (*p
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
@@ -13,7 +12,12 @@ module P = Permutation;;
    par leurs permutations associées.
 *)
 
-type braid_permlist = {delta_power : int; permlist : P.permutation list};;
+type braid_permlist = {bpl_size : int; delta_power : int; permlist : P.permutation list};;
+
+(* Tresses de base : $\Delta$ et la tresse vide
+*)
+let delta n = {bpl_size = n; delta_power = 1; permlist = []};;
+let empty n = {bpl_size = n; delta_power = 0; permlist = []};;
 
 (*s Conversion d'une tresse décrit par un mot sur l'alphabet des générateurs
    en une représentation sous forme de liste de permutations.
@@ -50,7 +54,7 @@ let get_permlist_decomposition (b : Braid.braid) =
                                                 then P.tau perm
                                                 else perm)
                      perm_stack in
-    {delta_power = delta_pow; permlist = perm_list};;
+    {bpl_size = n; delta_power = delta_pow; permlist = perm_list};;
 
 (*s Mise sous forme maximale à gauche (left-weighted) d'une liste de permutations (et non
    d'une tresse complète : voir canonicize pour celà).
@@ -109,7 +113,7 @@ let canonicize bpl =
       ok := true
     )
   done;
-  {delta_power = !dp; permlist = !pl};;
+  {bpl_size = bpl.bpl_size; delta_power = !dp; permlist = !pl};;
 
 (* Met une tresse décrite par un mot de tresse sous forme canonique.
 *)
@@ -134,7 +138,8 @@ let permlists_equal bpl1 bpl2 = (canonicize bpl1) = (canonicize bpl2);;
 *)
 
 let product a b =
-  {delta_power = a.delta_power + b.delta_power;
+  {bpl_size = a.bpl_size;
+   delta_power = a.delta_power + b.delta_power;
    permlist = (if b.delta_power mod 2 <> 0 then List.map P.tau a.permlist else a.permlist)
               @ b.permlist };;
 
@@ -157,17 +162,33 @@ let inverse b =
                       ((parity + 1) mod 2,
                        (if parity = 0 then p'::acc else (P.tau p')::acc)))
                    ((abs q) mod 2, []) b.permlist in
-  {
+  { bpl_size = b.bpl_size;
     delta_power = - q - l;
     permlist = pl'
   };;
 
 (* Conjugué.
 
-   Conjugué de A par B : $B A B^{-1}$
+   Conjugué de A par B : $B^{-1} A B$
 *)
 
-let conjugate a b = (b <*> a) <*> (inverse b);;
+let conjugate a b = (inverse b) <*> a <*> b;;
+
+(*s Convertit une tresse sous forme canonique en sa permutation 
+    correspondante.
+    Il s'agit d'un antimorphisme (souvent noté $\pi$).
+*)
+
+let braid2perm b = 
+    let n = b.bpl_size in
+    let perm = (if b.delta_power mod 2 = 0 then
+                    P.make_id n
+                else
+                    P.make_delta n
+               ) in
+    let temp = Array.make n 0 in
+    List.iter (fun p -> P.compose ~dest:temp p perm; Array.blit temp 0 perm 0 n) b.permlist;
+    perm;;
 
 (*s Génère une tresse sous forme de liste de permutations aléatoire.
    À appeler avec l = DOUZE, n de l'ordre de 80 (en gros, $10^{1\ ou \ 2}$)
@@ -178,7 +199,7 @@ let random_braid_sequence n l =
     | 0 -> acc
     | i -> loop (P.random_permutation n :: acc) (i-1)
   in
-  {delta_power = l-(Random.int (3*l)); (* tout à fait arbitraire *)
+  {bpl_size = n; delta_power = l-(Random.int (3*l)); (* tout à fait arbitraire *)
    permlist = loop [] l};;
 
 (*s Affiche une tresse sous forme de permlist : (delta\_power | Permutations)

@@ -1,6 +1,10 @@
 open Braid;;
 
-type braid_permlist = {delta_power : int; permlist : Permutation.permutation list};;
+type braid_permlist = {bpl_size : int; delta_power : int; permlist : Permutation.permutation list};;
+
+val delta : int -> braid_permlist;;
+val empty : int -> braid_permlist;;
+
 val get_permlist_decomposition : braid -> braid_permlist;;
 val make_left_weighted : Permutation.permutation list -> Permutation.permutation list;;
 val canonicize : braid_permlist -> braid_permlist;;
@@ -12,6 +16,8 @@ val product : braid_permlist -> braid_permlist -> braid_permlist;;
 val (<*>) : braid_permlist -> braid_permlist -> braid_permlist;;
 val inverse : braid_permlist -> braid_permlist;;
 val conjugate : braid_permlist -> braid_permlist -> braid_permlist;;
+
+val braid2perm : braid_permlist -> Permutation.permutation;;
 
 val random_braid_sequence : int -> int -> braid_permlist;;
 

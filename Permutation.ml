@@ -63,9 +63,13 @@ let inv permut =
     done;
     inv;;
 
-let compose p1 p2 =
+let compose ?dest p1 p2 =
     let n = Array.length p1 in
-    let c = Array.make n 0 in
+    let c = (
+    match dest with 
+	None -> Array.make n 0
+      | Some c -> c
+    ) in
     for i = 0 to n-1 do
         c.(i) <- p1.(p2.(i))
     done;

@@ -8,7 +8,7 @@ val make_transpose : int -> int -> int -> permutation;;
 val make_delta : int -> permutation;;
 val is_delta : permutation -> bool;;
 val inv : permutation -> permutation;;
-val compose : permutation -> permutation -> permutation;;
+val compose : ?dest:permutation -> permutation -> permutation -> permutation;;
 val tau : permutation -> permutation;;
 val compose_transpose_left : permutation -> int -> int -> permutation;;
 val compose_transpose_right : permutation -> int -> int -> permutation;;
