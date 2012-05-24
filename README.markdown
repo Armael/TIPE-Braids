@@ -16,9 +16,5 @@ pour compiler en bytecode, et
     
 pour compiler en natif avec un compilateur capable d'optimisations.
     
-Il est possible d'exporter le code source grâce à ocamlweb. Pour ce faire, pour convertir
-en latex le code du fichier Canonical.ml par exemple :
-
-    ocamlweb Canonical.ml -o Canonical.tex
-    sed -i 's/latin1/utf8/' Canonical.tex # Workaround au sujet de l'encodage en attendant
-                                          # une meilleure solution
+Il est possible d'exporter le code source grâce à ocamlweb. Pour ce faire, utiliser le
+script makedoc.sh en lui passant en argument le fichier source.
