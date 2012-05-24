@@ -94,3 +94,10 @@ let a_algorithm v w =
   nw := m <*> !nw <*> (inverse m);
   if permlists_equal cv !nw then !a else raise (Failure "failed");;
 
+let try_hack pub exch (* conjugué *) =
+  let n = pub.bpl_size in
+  try a_algorithm pub exch
+  with Failure s -> (
+    try a_algorithm (conjugate (delta n) pub) exch
+    with Failure s -> raise (Failure "fail")
+  );;
