@@ -37,6 +37,14 @@ let is_id p =
   done;
   !ok;;
 
+(*  Compose la permutation fournie par la transposition $(i, j)$ (à droite)
+    avec mutation de la permutation fournie (en O(1)).
+*)
+let transpose permut i j =
+    let tmp = permut.(i) in
+    permut.(i) <- permut.(j);
+    permut.(j) <- tmp;;
+
 (* Retourne la transposition $(i, j)$.
 *)
 let make_transpose i j n =
@@ -105,14 +113,6 @@ let tau p =
 
 (*s Composition par une permutation.
 *)
-
-(*  Compose la permutation fournie par la transposition $(i, j)$ (à droite)
-    avec mutation de la permutation fournie (en O(1)).
-*)
-let transpose permut i j =
-    let tmp = permut.(i) in
-    permut.(i) <- permut.(j);
-    permut.(j) <- tmp;;
 
 (* Compose à gauche par la transposition $(i, j)$ sans mutation
    de la permutation fournie (en O(n)).
