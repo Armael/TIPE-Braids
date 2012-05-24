@@ -1,5 +1,17 @@
+(*p
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+*)
+
+(* On travaille sur les tresses représentées par les mots de tresses sur 
+   l'alphabet dans la présentation d'Artin
+*)
 open Braid
 
+(*s Affiche une représentation ASCII de la tresse fournie
+*)
 let ascii b =
     let print_vert () =
         print_string " |" in
@@ -24,11 +36,16 @@ let ascii b =
                    aux xs in
     aux b.word;;
 
-(* ratio hauteur du sigma / épaisseur des brins *)
+(*s Représentation graphique grâce au module Graphics
+*)
+
+(* Ratio hauteur du sigma / épaisseur des brins
+*)
 let ratio = 10;;
 
 (* Dessine le croisement sigma positif à la position x,y
-de hauteur h (coordonnées en bas à gauche de la tresse) *)
+de hauteur h (coordonnées en bas à gauche de la tresse)
+*)
 let sigma_p x y h = let e = h/ratio in
                     let open Graphics in
                     fill_poly [| (x+h/2-e, y+h); (x+h/2, y+h); (x+h+h/2, y); (x+h-e+h/2, y) |];
@@ -40,7 +57,8 @@ let sigma_p x y h = let e = h/ratio in
                   
 
 (* Dessine le croisement sigma négatif à la position x,y
-de hauteur h (coordonnées en bas à gauche de la tresse) *)
+de hauteur h (coordonnées en bas à gauche de la tresse)
+*)
 let sigma_n x y h = let e = h/ratio in
                     let open Graphics in
                     fill_poly [| (x+h/2-e, y); (x+h/2, y); (x+h+h/2, y + h); (x+h+h/2-e, y + h) |];
@@ -49,11 +67,14 @@ let sigma_n x y h = let e = h/ratio in
                                  (x+h+h/2, y); (x+h+h/2-2*e, y) |];
                     set_color black;
                     fill_poly [| (x+h/2-e, y+h); (x+h/2, y+h); (x+h+h/2, y); (x+h+h/2-e, y) |];;
-                    
+(* Dessine une barre verticale (brin ne se croisant pas)
+*)                    
 let vert x y h = let e = h/ratio in
                  let open Graphics in
                  fill_poly [| (x+h/2-e, y); (x+h/2, y); (x+h/2, y+h); (x+h/2-e, y+h) |];;
 
+(* Affichage graphique de la tresse
+*)
 let display b =
     let size = b.size and height = List.length b.word in
     let h = (if height = 0 then 60 else min (600/height) 60) in

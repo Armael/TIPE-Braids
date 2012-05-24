@@ -1,23 +1,24 @@
+(*p
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+*)
+
+(* Module de gestion de permutations et de conversions 
+   Tresses simples $\leftrightarrow$ Permutation (d'après la bijection entre 
+   ces deux ensembles)
+*)
+
+(* Type décrivant une permutation :
+*)
 type permutation = int array;;
 
-let transpose permut i j =
-    let tmp = permut.(i) in
-    permut.(i) <- permut.(j);
-    permut.(j) <- tmp;;
+(*s Gestion de permutations élémentaires.
+*)
 
-(* La fonction renvoie une liste _triée_
-   des inversions *)
-let consecutive_inversions permut =
-    let n = Array.length permut in
-    if n <= 1 then [] else (
-        let l = ref [] in
-        for i=0 to n-2 do
-            if permut.(i) > permut.(i+1)
-            then l := i::!l;
-        done;
-        List.rev !l
-    );;
-
+(* Retourne la permutation identité.
+*)
 let make_id n =
     let id = Array.make n 0 in
     for i = 0 to n-1 do
@@ -25,6 +26,8 @@ let make_id n =
     done;
     id;;
 
+(* Teste si une permutation est l'identité.
+*)
 let is_id p =
   let n = Array.length p in
   let ok = ref true and i = ref 0 in
@@ -34,11 +37,16 @@ let is_id p =
   done;
   !ok;;
 
+(* Retourne la transposition $(i, j)$.
+*)
 let make_transpose i j n =
     let t = make_id n in
     transpose t i j;
     t;;
 
+(* Retourne la permutation correspondant à la tresse
+   simple $\Delta$.
+*)
 let make_delta n =
     let delta = Array.make n 0 in
     for i = 0 to n-1 do
@@ -46,6 +54,8 @@ let make_delta n =
     done;
     delta;;
 
+(* Teste si une permutation est $\Delta$.
+*)
 let is_delta p =
   let n = Array.length p in
   let ok = ref true and i = ref 0 in
@@ -55,6 +65,8 @@ let is_delta p =
   done;
   !ok;;
 
+(*s Inverse une permutation.
+*)
 let inv permut =
     let n = Array.length permut in
     let inv = Array.make n 0 in
@@ -63,6 +75,11 @@ let inv permut =
     done;
     inv;;
 
+(*s Compose les permutations p1 et p2 : pour des questions
+   d'optimisation il est possible de fournir un tableau (dest)
+   qui sera rempli de manière à contenir la composée; dans le cas
+   contraire un nouveau tableau rempli correctement sera retourné.
+*)
 let compose ?dest p1 p2 =
     let n = Array.length p1 in
     let c = (
@@ -75,8 +92,9 @@ let compose ?dest p1 p2 =
     done;
     c;;
 
-(* Conjugué par Delta;
-tau(sigma_i) = sigma_(n-i) *)
+(*s Conjugué par $\Delta$ : $\tau(b) = \Delta^{-1}b\Delta$.
+   On a également $\tau(\sigma_i) = \sigma_{n-i}$.
+*)
 let tau p =
     let n = Array.length p in 
     let q = Array.make n 0 in
@@ -85,8 +103,20 @@ let tau p =
     done;
     q;;
 
-(* Pour diminuer le nombre d'allocations liées à la composition
-   d'une permutation par une transposition *)
+(*s Composition par une permutation.
+*)
+
+(*  Compose la permutation fournie par la transposition $(i, j)$ (à droite)
+    avec mutation de la permutation fournie (en O(1)).
+*)
+let transpose permut i j =
+    let tmp = permut.(i) in
+    permut.(i) <- permut.(j);
+    permut.(j) <- tmp;;
+
+(* Compose à gauche par la transposition $(i, j)$ sans mutation
+   de la permutation fournie (en O(n)).
+*)
 let compose_transpose_left permut i j =
   let n = Array.length permut in
   let res = Array.make n 0 in
@@ -98,25 +128,66 @@ let compose_transpose_left permut i j =
   done;
   res;;
 
+(* Compose à droite par la transposition $(i, j)$ sans mutation
+   de la permutation fournie (en 0(n)).
+*)
 let compose_transpose_right permut i j =
   let res = Array.copy permut in
   transpose res i j;
   res;;
 
+(*s Fonction renvoyant la permutation correspondant à une tresse
+    fournie en argument. (Antimorphisme)
 
-(* pas sûr que ça soit juste ... *)
+    Fonctionnement : on part de la permutation identité et on applique
+    successivement les transpositions correspondant aux générateurs : comme
+    on compose à droite (en O(1)) et qu'on réalise un antimorphisme il est nécessaire
+    de retourner la liste des générateurs.
+*)
 let braid_to_permut (b : Braid.braid) =
     let permut = make_id b.Braid.size in
-    List.iter (fun x -> transpose permut ((abs x)-1) (abs x)) b.Braid.word;
+    List.iter (fun x -> transpose permut ((abs x)-1) (abs x)) (List.rev b.Braid.word);
     permut;;
 
-(* Les listes retournées sont triées pour les deux fonctions ci-dessous *)
+(*s Starting Set et Finishing Set pour une permutation :
+
+      - Le Starting Set correspond aux générateurs que l'on peut factoriser à gauche d'une tresse positive
+        (qui divisent la tresse à gauche dans $B_n^+$).
+        On a par ailleurs le résultat suivant : $i$ $\in$ S(B) (où S(B) désigne le starting set de B) $\Leftrightarrow$ les brins $i$ et $i+1$ se croisent dans la permutation correspondante. (c'est géométrique)
+
+      - Si F(B) désigne le Finishing Set de B, on a F(B) = S(rev(B)).
+*)
+
+(* Renvoie la liste des inversions d'une permutation $\sigma$ : il s'agit
+   d'indices i tels que $\sigma(i+1) < \sigma(i)$.
+
+   La fonction renvoie une liste \textbf{triée}
+   des inversions.
+*)
+let consecutive_inversions permut =
+    let n = Array.length permut in
+    if n <= 1 then [] else (
+        let l = ref [] in
+        for i=0 to n-2 do
+            if permut.(i) > permut.(i+1)
+            then l := i::!l;
+        done;
+        List.rev !l
+    );;
+(* Les listes retournées sont triées pour les deux fonctions ci-dessous.
+*)
 let starting_set p = List.map ((+) 1) (consecutive_inversions p);;
 (* On a bien S(inv de permutation) = F(permutation) à la place d'utiliser
-le rev de la tresse correspondante *)
+   le rev() de la tresse correspondante.
+*)
 let finishing_set p = starting_set (inv p);;
 
-(* Les listes doivent être triées *)
+(*s Opérations ensemblistes, où les ensembles sont représentés par des
+   des \textbf{listes triées}.
+*)
+
+(* Cherche si e est un sous-ensemble de f.
+*)
 let rec is_subset e f = match (e, f) with
     | ([], _) -> true
     | (_, []) -> false
@@ -124,6 +195,8 @@ let rec is_subset e f = match (e, f) with
                         else if x = y then is_subset xs ys
                              else is_subset (x::xs) ys;; 
 
+(* Renvoie $e \backslash f$.
+*)
 let rec set_difference e f = match (e, f) with
     | ([], _) -> []
     | (_, []) -> e
@@ -132,10 +205,12 @@ let rec set_difference e f = match (e, f) with
                              else set_difference (x::xs) ys;; 
 
 
-(* Mélange aléatoire d'un tableau avec l'algo de Knuth-Fisher-Yates,
-   appliqué à la génération d'une permutation aléatoire *)
+(*s Mélange aléatoire d'un tableau avec l'algo de Knuth-Fisher-Yates,
+   appliqué à la génération d'une permutation aléatoire.
+*)
 
-(* mélange sur place, modifie le tableau *)
+(* Mélange sur place, modifie le tableau.
+*)
 let shuffle t =
   Random.self_init ();
   let swap i j = let temp = t.(i) in
@@ -148,8 +223,12 @@ let shuffle t =
   done;
   t;;
 
+(* Renvoie une permutation aléatoire.
+*)
 let random_permutation n = shuffle (make_id n);;
 
+(*s Fonction d'affichage d'une permutation.
+*)
 let print_permutation p =
   print_string "[";
   print_int p.(0);
