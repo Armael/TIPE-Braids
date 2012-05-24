@@ -19,10 +19,24 @@ let rec last = function
   | [x] -> x
   | x::xs -> last xs;;
 
-(* Transforme une permutation represantant une tresse simple _differente de delta_
-   en la braid_permlist associee
+(* Transforme une permutation represantant une tresse simple _differente de delta
+   et de l'identité _ en la braid_permlist associée
 *)
 let p2b perm = {bpl_size = Array.length perm; delta_power = 0; permlist = [perm]};;
+
+let cycling1 n w =
+  let g = (delta n) <*> 
+    (inverse (p2b ((if (inf w) mod 2 <> 0 then P.tau else id) (List.hd w.permlist)))) in
+  (g, g <*> w <*> (inverse g));;
+
+let cycling2 n w =
+  let g = (delta n) <*> 
+    (inverse (p2b ((if (inf w) mod 2 <> 0 then P.tau else id) (List.hd w.permlist)))) in
+  let rec cycle r a = function
+    | [] -> [(if ((r+1) mod 2 <> 0) then P.tau else id) a]
+    | x::xs -> (P.tau x)::(cycle r a xs) in
+  (g, {bpl_size = w.bpl_size; delta_power = w.delta_power; 
+       permlist = (if w.permlist = [] then [] else (cycle w.delta_power (List.hd w.permlist) (List.tl w.permlist)))});;
 
 let guess_permutation v w =
   let n = v.bpl_size in
@@ -49,6 +63,7 @@ let guess_permutation v w =
 	r := tau.(!r);
 	xi.(!r) <- true
       done;
+
       tau.(!r) <- i
     )
   done;
@@ -59,22 +74,23 @@ let guess_permutation v w =
 let a_algorithm v w =
   let n = v.bpl_size in
   let a = ref (empty n) in
-  let nv = ref (canonicize v) and nw = ref (canonicize w) in
-  while (inf !nw) < (inf !nv) do
-    let g = (delta n) <*> 
-            (inverse (p2b ((if (inf !nw) mod 2 <> 0 then P.tau else id) (List.hd !nw.permlist)))) in
-    a := g <*> !a;
-    nw := g <*> !nw <*> (inverse g);
-    nw := canonicize !nw
+  let cv = canonicize v and nw = ref (canonicize w) in
+  while (inf !nw) < (inf cv) do
+    let c = cycling1 n !nw in
+    a := (fst c) <*> !a;
+    nw := snd c;
+    nw := canonicize !nw;
+    Printf.printf "a";
   done;
-  while (sup !nw) > (sup !nv) do
+  while (sup !nw) > (sup cv) do
     let g = p2b (last !nw.permlist) in
     a := g <*> !a;
     nw := g <*> !nw <*> (inverse g);
-    nw := canonicize !nw
+    nw := canonicize !nw;
+    Printf.printf "b";
   done;
-  let m = guess_permutation !nv !nw in
+  let m = guess_permutation cv !nw in
   a := m <*> !a;
   nw := m <*> !nw <*> (inverse m);
-  if !nv = !nw then !a else raise (Failure "failed");;
+  if permlists_equal cv !nw then !a else raise (Failure "failed");;
 
