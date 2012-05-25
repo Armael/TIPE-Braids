@@ -42,20 +42,20 @@ let guess_permutation v w =
   let n = v.bpl_size in
   let tau = P.make_id n in
   let chi = Array.make n false in
-  let pi_v = braid2perm v and pi_w = braid2perm w in
+  let perm_v = braid2perm v and perm_w = braid2perm w in
   let r = ref 0 and s = ref 0 in
   for i = n-1 downto 0 do
     r := i; s := i; 
     while chi.(!r) = false do
       chi.(!r) <- true;
-      r := pi_v.(!r);
-      s := pi_w.(!s);
+      r := perm_v.(!r);
+      s := perm_w.(!s);
       if !r <> !s then
 	tau.(!r) <- !s
     done;
   done;
   let xi = Array.make n false in
-  for i = 0 to n-1 do
+  for i = n-1 downto 0 do
     if xi.(i) = false then (
       xi.(i) <- true;
       r := i;
@@ -63,13 +63,14 @@ let guess_permutation v w =
 	r := tau.(!r);
 	xi.(!r) <- true
       done;
-
       tau.(!r) <- i
     )
   done;
   if P.is_id tau then {bpl_size = n; delta_power = 0; permlist = []}
   else if P.is_delta tau then {bpl_size = n; delta_power = 1; permlist = []}
   else {bpl_size = n; delta_power = 0; permlist = [tau]};;
+
+exception Echec;;
 
 let a_algorithm v w =
   let n = v.bpl_size in
@@ -80,24 +81,24 @@ let a_algorithm v w =
     a := (fst c) <*> !a;
     nw := snd c;
     nw := canonicize !nw;
-    Printf.printf "a";
   done;
   while (sup !nw) > (sup cv) do
     let g = p2b (last !nw.permlist) in
     a := g <*> !a;
     nw := g <*> !nw <*> (inverse g);
     nw := canonicize !nw;
-    Printf.printf "b";
   done;
   let m = guess_permutation cv !nw in
   a := m <*> !a;
   nw := m <*> !nw <*> (inverse m);
-  if permlists_equal cv !nw then !a else raise (Failure "failed");;
+  if permlists_equal cv !nw then !a else raise Echec;;
 
 let try_hack pub exch (* conjugué *) =
   let n = pub.bpl_size in
   try a_algorithm pub exch
-  with Failure s -> (
-    try a_algorithm (conjugate (delta n) pub) exch
-    with Failure s -> raise (Failure "fail")
+  with Echec -> (
+    try let res2 = a_algorithm (conjugate pub (delta n)) exch in
+	delta n <*> res2
+    with Echec -> raise (Failure "fail")
+       | Failure s -> Printf.printf "Error : %s\n" s; raise (Failure "epic fail")
   );;
