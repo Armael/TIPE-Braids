@@ -155,7 +155,7 @@ let (<*>) = product;;
    
 let inverse b =
   let l = List.length b.permlist and q = b.delta_power in
-  let delta = P.make_delta (Array.length (List.hd b.permlist)) in
+  let delta = P.make_delta b.bpl_size in
   let (_, pl') =
     List.fold_left (fun (parity, acc) p ->
                       let p' = P.compose (P.inv p) delta in
