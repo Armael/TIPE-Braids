@@ -205,6 +205,53 @@ let rec set_difference e f = match (e, f) with
                              else set_difference (x::xs) ys;; 
 
 
+(* Calcul du pgcd à gauche de tresses simples en O(n log n) *)
+let meet a b =
+  let n = Array.length a in
+  let c = make_id n in (* on va calculer C = pgcd(A,B)^-1 *)
+
+  (* Tableaux réutilisés dans la fonction qui suit *)
+  let u = Array.make n 0 and v = Array.make n 0 and w = Array.make n 0 in
+
+  (* Merge sort de C[s...t] selon la relation
+        x R y <=> D(x) < D(y)
+     (où D = pgcd(A,B) est vue comme une permutation) *)
+  let rec subarray_sort s t =
+    if t > s then (
+      let m = (s+t)/2 in
+      subarray_sort s m;
+      subarray_sort (m+1) t;
+
+      u.(m) <- a.(c.(m));
+      v.(m) <- b.(c.(m));
+      if s < m then
+	for i = m-1 downto s do
+	  u.(i) <- min a.(c.(i)) u.(i+1);
+	  v.(i) <- min b.(c.(i)) v.(i+1);
+	done;
+      u.(m+1) <- a.(c.(m+1));
+      v.(m+1) <- b.(c.(m+1));
+      if t > m+1 then
+	for i = m+2 to t do
+	  u.(i) <- max a.(c.(i)) u.(i-1);
+	  v.(i) <- max b.(c.(i)) v.(i-1);
+	done;
+      
+      let l = ref s and r = ref (m+1) in
+      for i = s to t do
+	if (!l > m) || ((!r <= t) && (u.(!l) > u.(!r)) && (v.(!l) > v.(!r)))
+	then ( w.(i) <- c.(!r); r := !r + 1; )
+	else ( w.(i) <- c.(!l); l := !l + 1; )
+      done;
+      for i = s to t do
+	c.(i) <- w.(i);
+      done;
+    )
+  in
+  
+  subarray_sort 0 (n-1);
+  inv c;;
+
 (*s Mélange aléatoire d'un tableau avec l'algo de Knuth-Fisher-Yates,
    appliqué à la génération d'une permutation aléatoire.
 *)

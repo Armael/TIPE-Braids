@@ -56,6 +56,7 @@ let get_permlist_decomposition (b : Braid.braid) =
                      perm_stack in
     {bpl_size = n; delta_power = delta_pow; permlist = perm_list};;
 
+
 (*s Mise sous forme maximale à gauche (left-weighted) d'une liste de permutations (et non
    d'une tresse complète : voir canonicize pour celà).
    
@@ -67,32 +68,48 @@ let get_permlist_decomposition (b : Braid.braid) =
 *)
 
 let make_left_weighted start_pl =
-  let continue = ref true in (* référence mis à true à chaque fois que iter provoque une
-                                modification de la permlist manipulée *)
-  let rec iter = function (* 1 itération effectuant des modifications / simplifications
-                             dans la liste sans reculer *)
-    | []        -> []
-    | [p]       -> if P.is_id p then [] else [p]
-    | p1::p2::q ->
-        let s2 = P.starting_set p2 and f1 = P.finishing_set p1 in
-          if      s2 = [] (* p2 = id *) then ( continue := true; iter (p1::q) )
-          else if f1 = [] (* p1 = id *) then ( continue := true; iter (p2::q) )
-          else (
-            match P.set_difference s2 f1 with
-              | [] -> p1::iter (p2::q) (* rien à modifier ici, on va plus loin *)
-              | i::_ -> 
-                  continue := true;
-                  let p1' = P.compose_transpose_left  p1 (i-1) i in
-                  let p2' = P.compose_transpose_right p2 (i-1) i in
-                  iter (p1'::p2'::q)
-          )
+
+  let continue = ref true in
+  
+  (* trouver la décomposition maximale à gauche de A_1 A_2,
+     de permutations associées respectives p1 et p2 *)
+  let rec make_lw_pair p1 p2 =
+    let s2 = P.starting_set p2 and f1 = P.finishing_set p1 in
+    if      s2 = [] (* p2 = id *) then [p1]
+    else if f1 = [] (* p1 = id *) then [p2] (* peu probable *)
+    else match P.set_difference s2 f1 with
+      | []   -> [p1; p2] (* p1 facteur maximal *)
+      | i::_ -> continue := true;
+	        let p1' = P.compose_transpose_left  p1 (i-1) i in
+		let p2' = P.compose_transpose_right p2 (i-1) i in
+		make_lw_pair p1' p2'
   in
+  
+  let make_lw_pair' p1 p2 =
+    let b = P.meet (P.compose (P.inv p1) (P.make_delta (Array.length p1))) p2 in
+    if not (P.is_id b) then (
+      continue := true;
+      List.filter (fun x -> not (P.is_id x)) [P.compose p1 b; P.compose (P.inv b) p2]
+    ) else (
+      List.filter (fun x -> not (P.is_id x)) [p1; p2]
+    )
+  in
+
+  (* On réduit la liste des facteurs à partir de la fin *)
+  let rec reduce = function
+    | [] -> []
+    | p1::q -> match reduce q with
+	| [] -> [p1]
+	| p2::q' -> make_lw_pair' p1 p2 @ q'
+  in
+  
   let current_pl = ref start_pl in
   while !continue do
     continue := false;
-    current_pl := iter !current_pl;
+    current_pl := reduce !current_pl
   done;
   !current_pl;;
+
 
 (*s Met une tresse décrite sous forme de liste de permutations sous forme canonique.
    
@@ -100,7 +117,7 @@ let make_left_weighted start_pl =
    les tresses simples égales à $\Delta$ en tête de liste (s'il y a un $\Delta$, il
    est forcément en tête de liste). Incrémente le champ delta\_power en conséquence.
 *)
-   
+
 let canonicize bpl =
   let dp = ref bpl.delta_power 
   and pl = ref (make_left_weighted bpl.permlist)
@@ -115,10 +132,12 @@ let canonicize bpl =
   done;
   {bpl_size = bpl.bpl_size; delta_power = !dp; permlist = !pl};;
 
+
 (* Met une tresse décrite par un mot de tresse sous forme canonique.
 *)
 
 let canonical_form b = canonicize (get_permlist_decomposition b);;
+
 
 (*s Tests d'égalité.
 

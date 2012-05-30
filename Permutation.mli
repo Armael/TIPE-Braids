@@ -17,6 +17,7 @@ val starting_set : permutation -> int list;;
 val finishing_set : permutation -> int list;;
 val is_subset : int list -> int list -> bool;;
 val set_difference : int list -> int list -> int list;;
+val meet : permutation -> permutation -> permutation;;
 val shuffle : 'a array -> 'a array;;
 val random_permutation : int -> permutation;;
 val print_permutation : permutation -> unit;;
