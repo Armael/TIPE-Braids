@@ -32,31 +32,32 @@ let empty n = {bpl_size = n; delta_power = 0; permlist = []};;
    On simplifie les calculs en se rappelant que $\tau^2 = id$.
 *)
 
-let get_permlist_decomposition (b : Braid.braid) = 
+let get_permlist_decomposition b = 
     let n = b.Braid.size in
     (* Calcule $\Delta \times \sigma^{-1}$ que l'on sait être un facteur canonique *)
     let delta = P.make_delta n in
     let neg_to_perm x = P.compose_transpose_left delta (-x-1) (-x) in
-    (* Applique l'algorithme, en mémorisant la puissance de $\tau$ à appliquer *)
+    (* Applique l'algorithme, en mémorisant le nombre de deltas rencontrés avant
+       qui permettra de déduire la puissance de tau à appliquer
+    *)
     let (delta_pow, perm_stack) = 
         List.fold_left (fun (delta_pow, perm_stack) x ->
                           if x > 0 then
-                            (delta_pow, 
-                            (P.make_transpose (x-1) x n, 0)::perm_stack)
+                            (delta_pow,
+                             (P.make_transpose (x-1) x n, delta_pow)::perm_stack)
                           else
                             (delta_pow - 1,
-                             (neg_to_perm x, 0)::
-                             (List.map (fun (p, tau_pow) -> (p, tau_pow + 1)) perm_stack)))
-                       (0, []) b.Braid.word in
+                             (neg_to_perm x, delta_pow - 1)::perm_stack))
+                       (0, []) b.Braid.word
+    in
     (* On applique la puissance de $\tau$ si nécessaire *)
     let perm_list =
-        List.rev_map (fun (perm, tau_pow) -> if (tau_pow mod 2) <> 0
-                                                then P.tau perm
-                                                else perm)
-                     perm_stack in
+        List.rev_map (fun (perm, delta_pow_partial) ->
+                        if ((delta_pow - delta_pow_partial) mod 2) <> 0
+                        then P.tau perm else perm)
+                     perm_stack
+    in
     {bpl_size = n; delta_power = delta_pow; permlist = perm_list};;
-
-
 (*s Mise sous forme maximale à gauche (left-weighted) d'une liste de permutations (et non
    d'une tresse complète : voir canonicize pour celà).
    
