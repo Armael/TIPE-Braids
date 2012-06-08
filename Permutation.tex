@@ -1,0 +1,465 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[headings]{fullpage}
+\usepackage{ocamlweb}
+\pagestyle{headings}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This file has been automatically generated with the command
+%% ocamlweb --header --no-index Permutation.ml -o Permutation.tex 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\typeout{OcamlWeb file Permutation.ml}
+\ocwmodule{Permutation}
+\allowbreak\ocwsection
+\label{Permutation.ml:0}%
+Module de gestion de permutations et de conversions 
+   Tresses simples $\leftrightarrow$ Permutation (d'après la bijection entre 
+   ces deux ensembles)
+
+\ocweol
+\ocwindent{0.00em}
+Type décrivant une permutation :
+
+\ocweol
+\label{Permutation.ml:299}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{type}~$\ocwlowerid{permutation}~=~$\ocwbt{int}~\ocwbt{array}\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:333}%
+Gestion de permutations élémentaires.
+
+\ocweol
+\ocwindent{0.00em}
+Retourne la permutation identité.
+
+\ocweol
+\label{Permutation.ml:420}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{make\_id}~\ocwlowerid{n}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{id}~=~\ocwupperid{Array.}\ocwlowerid{make}~\ocwlowerid{n}~0~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~0~$\ocwkw{to}~$\ocwlowerid{n}-1~$\ocwkw{do}\ocweol
+\ocwindent{4.00em}
+$\ocwlowerid{id}.(\ocwlowerid{i})~\leftarrow{}~\ocwlowerid{i}$\ocweol
+\ocwindent{2.00em}
+\ocwkw{done};\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{id}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Teste si une permutation est l'identité.
+
+\ocweol
+\label{Permutation.ml:579}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{is\_id}~\ocwlowerid{p}~=$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{p}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{ok}~=~$\ocwbt{ref}~\ocwkw{true}~\ocwkw{and}~$\ocwlowerid{i}~=~$\ocwbt{ref}~0~\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{while}~!$\ocwlowerid{ok}~\land{}~!\ocwlowerid{i}~<~\ocwlowerid{n}~$\ocwkw{do}\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{ok}~:=~(\ocwlowerid{p}.(!\ocwlowerid{i})~=~!\ocwlowerid{i});$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{i}~:=~!\ocwlowerid{i}+1$\ocweol
+\ocwindent{1.00em}
+\ocwkw{done};\ocweol
+\ocwindent{1.00em}
+!$\ocwlowerid{ok}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Retourne la transposition $(i, j)$.
+
+\ocweol
+\label{Permutation.ml:781}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{make\_transpose}~\ocwlowerid{i}~\ocwlowerid{j}~\ocwlowerid{n}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{t}~=~\ocwlowerid{make\_id}~\ocwlowerid{n}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{transpose}~\ocwlowerid{t}~\ocwlowerid{i}~\ocwlowerid{j};$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{t}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Retourne la permutation correspondant à la tresse
+   simple $\Delta$.
+
+\ocweol
+\label{Permutation.ml:940}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{make\_delta}~\ocwlowerid{n}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{delta}~=~\ocwupperid{Array.}\ocwlowerid{make}~\ocwlowerid{n}~0~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~0~$\ocwkw{to}~$\ocwlowerid{n}-1~$\ocwkw{do}\ocweol
+\ocwindent{4.00em}
+$\ocwlowerid{delta}.(\ocwlowerid{i})~\leftarrow{}~\ocwlowerid{n}-1-\ocwlowerid{i}$\ocweol
+\ocwindent{2.00em}
+\ocwkw{done};\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{delta}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Teste si une permutation est $\Delta$.
+
+\ocweol
+\label{Permutation.ml:1112}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{is\_delta}~\ocwlowerid{p}~=$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{p}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{ok}~=~$\ocwbt{ref}~\ocwkw{true}~\ocwkw{and}~$\ocwlowerid{i}~=~$\ocwbt{ref}~0~\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{while}~!$\ocwlowerid{ok}~\land{}~!\ocwlowerid{i}~<~\ocwlowerid{n}~$\ocwkw{do}\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{ok}~:=~(\ocwlowerid{p}.(!\ocwlowerid{i})~=~\ocwlowerid{n}~-~1~-~!\ocwlowerid{i});$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{i}~:=~!\ocwlowerid{i}+1$\ocweol
+\ocwindent{1.00em}
+\ocwkw{done};\ocweol
+\ocwindent{1.00em}
+!$\ocwlowerid{ok}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:1285}%
+Inverse une permutation.
+
+\ocweol
+\label{Permutation.ml:1315}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{inv}~\ocwlowerid{permut}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{permut}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{inv}~=~\ocwupperid{Array.}\ocwlowerid{make}~\ocwlowerid{n}~0~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~0~$\ocwkw{to}~$\ocwlowerid{n}-1~$\ocwkw{do}\ocweol
+\ocwindent{4.00em}
+$\ocwlowerid{inv}.(\ocwlowerid{permut}.(\ocwlowerid{i}))~\leftarrow{}~\ocwlowerid{i}$\ocweol
+\ocwindent{2.00em}
+\ocwkw{done};\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{inv}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:1476}%
+Compose les permutations p1 et p2 : pour des questions
+   d'optimisation il est possible de fournir un tableau (dest)
+   qui sera rempli de manière à contenir la composée; dans le cas
+   contraire un nouveau tableau rempli correctement sera retourné.
+
+\ocweol
+\label{Permutation.ml:1736}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{compose}~?\ocwlowerid{dest}~\ocwlowerid{p1}~\ocwlowerid{p2}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{p1}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{c}~=~($\ocweol
+\ocwindent{2.00em}
+\ocwkw{match}~$\ocwlowerid{dest}~$\ocwkw{with}~\ocweol
+\ocwindent{4.00em}
+$\ocwupperid{None}~\rightarrow{}~\ocwupperid{Array.}\ocwlowerid{make}~\ocwlowerid{n}~0$\ocweol
+\ocwindent{3.00em}
+$\mid{}~\ocwupperid{Some}~\ocwlowerid{c}~\rightarrow{}~\ocwlowerid{c}$\ocweol
+\ocwindent{2.00em}
+$)~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~0~$\ocwkw{to}~$\ocwlowerid{n}-1~$\ocwkw{do}\ocweol
+\ocwindent{4.00em}
+$\ocwlowerid{c}.(\ocwlowerid{i})~\leftarrow{}~\ocwlowerid{p1}.(\ocwlowerid{p2}.(\ocwlowerid{i}))$\ocweol
+\ocwindent{2.00em}
+\ocwkw{done};\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{c}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:1955}%
+Conjugué par $\Delta$ : $\tau(b) = \Delta^{-1}b\Delta$.
+   On a également $\tau(\sigma_i) = \sigma_{n-i}$.
+
+\ocweol
+\label{Permutation.ml:2069}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{tau}~\ocwlowerid{p}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{p}~$\ocwkw{in}~\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{q}~=~\ocwupperid{Array.}\ocwlowerid{make}~\ocwlowerid{n}~0~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~0~$\ocwkw{to}~$\ocwlowerid{n}~-~1~$\ocwkw{do}\ocweol
+\ocwindent{4.00em}
+$\ocwlowerid{q}.(\ocwlowerid{n}-1-\ocwlowerid{i})~\leftarrow{}~\ocwlowerid{n}-1-\ocwlowerid{p}.(\ocwlowerid{i})$\ocweol
+\ocwindent{2.00em}
+\ocwkw{done};\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{q}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:2220}%
+Composition par une permutation.
+
+\ocweol
+\ocwindent{0.00em}
+Compose la permutation fournie par la transposition $(i, j)$ (à droite)
+    avec mutation de la permutation fournie (en O(1)).
+
+\ocweol
+\label{Permutation.ml:2394}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{transpose}~\ocwlowerid{permut}~\ocwlowerid{i}~\ocwlowerid{j}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{tmp}~=~\ocwlowerid{permut}.(\ocwlowerid{i})~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{permut}.(\ocwlowerid{i})~\leftarrow{}~\ocwlowerid{permut}.(\ocwlowerid{j});$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{permut}.(\ocwlowerid{j})~\leftarrow{}~\ocwlowerid{tmp}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Compose à gauche par la transposition $(i, j)$ sans mutation
+   de la permutation fournie (en O(n)).
+
+\ocweol
+\label{Permutation.ml:2612}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{compose\_transpose\_left}~\ocwlowerid{permut}~\ocwlowerid{i}~\ocwlowerid{j}~=$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{permut}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{res}~=~\ocwupperid{Array.}\ocwlowerid{make}~\ocwlowerid{n}~0~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{for}~$\ocwlowerid{k}=0~$\ocwkw{to}~$\ocwlowerid{n}-1~$\ocwkw{do}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{pk}~=~\ocwlowerid{permut}.(\ocwlowerid{k})~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{res}.(\ocwlowerid{k})~\leftarrow{}~($\ocwkw{if}~$\ocwlowerid{pk}~=~\ocwlowerid{i}~$\ocwkw{then}~$\ocwlowerid{j}~$\ocweol
+\ocwindent{8.00em}
+\ocwkw{else}~\ocwkw{if}~$\ocwlowerid{pk}~=~\ocwlowerid{j}~$\ocwkw{then}~$\ocwlowerid{i}$\ocweol
+\ocwindent{8.00em}
+\ocwkw{else}~$\ocwlowerid{pk})$\ocweol
+\ocwindent{1.00em}
+\ocwkw{done};\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{res}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Compose à droite par la transposition $(i, j)$ sans mutation
+   de la permutation fournie (en 0(n)).
+
+\ocweol
+\label{Permutation.ml:3004}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{compose\_transpose\_right}~\ocwlowerid{permut}~\ocwlowerid{i}~\ocwlowerid{j}~=$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{res}~=~\ocwupperid{Array.}\ocwlowerid{copy}~\ocwlowerid{permut}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{transpose}~\ocwlowerid{res}~\ocwlowerid{i}~\ocwlowerid{j};$\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{res}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:3110}%
+Fonction renvoyant la permutation correspondant à une tresse
+    fournie en argument. (Antimorphisme)
+
+    Fonctionnement : on part de la permutation identité et on applique
+    successivement les transpositions correspondant aux générateurs : comme
+    on compose à droite (en O(1)) et qu'on réalise un antimorphisme il est nécessaire
+    de retourner la liste des générateurs.
+
+\ocweol
+\label{Permutation.ml:3503}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{braid\_to\_permut}~(\ocwlowerid{b}~:~\ocwupperid{Braid.}\ocwlowerid{braid})~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{permut}~=~\ocwlowerid{make\_id}~\ocwlowerid{b.Braid.}\ocwlowerid{size}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+$\ocwupperid{List.}\ocwlowerid{iter}~($\ocwkw{fun}~$\ocwlowerid{x}~\rightarrow{}~\ocwlowerid{transpose}~\ocwlowerid{permut}~((\ocwlowerid{abs}~\ocwlowerid{x})-1)~(\ocwlowerid{abs}~\ocwlowerid{x}))~(\ocwupperid{List.}\ocwlowerid{rev}~\ocwlowerid{b.Braid.}\ocwlowerid{word});$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{permut}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:3687}%
+Starting Set et Finishing Set pour une permutation :
+
+      - Le Starting Set correspond aux générateurs que l'on peut factoriser à gauche d'une tresse positive
+        (qui divisent la tresse à gauche dans $B_n^+$).
+        On a par ailleurs le résultat suivant : $i$ $\in$ S(B) (où S(B) désigne le starting set de B) $\Leftrightarrow$ les brins $i$ et $i+1$ se croisent dans la permutation correspondante. (c'est géométrique)
+
+      - Si F(B) désigne le Finishing Set de B, on a F(B) = S(rev(B)).
+
+\ocweol
+\ocwindent{0.00em}
+Renvoie la liste des inversions d'une permutation $\sigma$ : il s'agit
+   d'indices i tels que $\sigma(i+1) < \sigma(i)$.
+
+   La fonction renvoie une liste \textbf{triée}
+   des inversions.
+
+\ocweol
+\label{Permutation.ml:4399}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{consecutive\_inversions}~\ocwlowerid{permut}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{permut}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{if}~$\ocwlowerid{n}~\le{}~1~$\ocwkw{then}~$[\,]~$\ocwkw{else}~$($\ocweol
+\ocwindent{4.00em}
+\ocwkw{let}~$\ocwlowerid{l}~=~$\ocwbt{ref}~$[\,]~$\ocwkw{in}\ocweol
+\ocwindent{4.00em}
+\ocwkw{for}~$\ocwlowerid{i}=0~$\ocwkw{to}~$\ocwlowerid{n}-2~$\ocwkw{do}\ocweol
+\ocwindent{6.00em}
+\ocwkw{if}~$\ocwlowerid{permut}.(\ocwlowerid{i})~>~\ocwlowerid{permut}.(\ocwlowerid{i}+1)$\ocweol
+\ocwindent{6.00em}
+\ocwkw{then}~$\ocwlowerid{l}~:=~\ocwlowerid{i}::!\ocwlowerid{l};$\ocweol
+\ocwindent{4.00em}
+\ocwkw{done};\ocweol
+\ocwindent{4.00em}
+$\ocwupperid{List.}\ocwlowerid{rev}~!\ocwlowerid{l}$\ocweol
+\ocwindent{2.00em}
+$)$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Les listes retournées sont triées pour les deux fonctions ci-dessous.
+
+\ocweol
+\label{Permutation.ml:4741}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{starting\_set}~\ocwlowerid{p}~=~\ocwupperid{List.}\ocwlowerid{map}~((+)~1)~(\ocwlowerid{consecutive\_inversions}~\ocwlowerid{p})$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+On a bien S(inv de permutation) = F(permutation) à la place d'utiliser
+   le rev() de la tresse correspondante.
+
+\ocweol
+\label{Permutation.ml:4927}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{finishing\_set}~\ocwlowerid{p}~=~\ocwlowerid{starting\_set}~(\ocwlowerid{inv}~\ocwlowerid{p})$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:4975}%
+Opérations ensemblistes, où les ensembles sont représentés par des
+   des \textbf{listes triées}.
+
+\ocweol
+\ocwindent{0.00em}
+Cherche si e est un sous-ensemble de f.
+
+\ocweol
+\label{Permutation.ml:5130}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~\ocwkw{rec}~$\ocwlowerid{is\_subset}~\ocwlowerid{e}~\ocwlowerid{f}~=~$\ocwkw{match}~$(\ocwlowerid{e},~\ocwlowerid{f})~$\ocwkw{with}\ocweol
+\ocwindent{2.00em}
+$\mid{}~([\,],~\ocwlowerid{\_})~\rightarrow{}~$\ocwkw{true}\ocweol
+\ocwindent{2.00em}
+$\mid{}~(\ocwlowerid{\_},~[\,])~\rightarrow{}~$\ocwkw{false}\ocweol
+\ocwindent{2.00em}
+$\mid{}~(\ocwlowerid{x}::\ocwlowerid{xs},~\ocwlowerid{y}::\ocwlowerid{ys})~\rightarrow{}~$\ocwkw{if}~$\ocwlowerid{x}~<~\ocwlowerid{y}~$\ocwkw{then}~\ocwkw{false}\ocweol
+\ocwindent{12.00em}
+\ocwkw{else}~\ocwkw{if}~$\ocwlowerid{x}~=~\ocwlowerid{y}~$\ocwkw{then}~$\ocwlowerid{is\_subset}~\ocwlowerid{xs}~\ocwlowerid{ys}$\ocweol
+\ocwindent{14.50em}
+\ocwkw{else}~$\ocwlowerid{is\_subset}~(\ocwlowerid{x}::\ocwlowerid{xs})~\ocwlowerid{ys}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Renvoie $e \backslash f$.
+
+\ocweol
+\label{Permutation.ml:5411}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~\ocwkw{rec}~$\ocwlowerid{set\_difference}~\ocwlowerid{e}~\ocwlowerid{f}~=~$\ocwkw{match}~$(\ocwlowerid{e},~\ocwlowerid{f})~$\ocwkw{with}\ocweol
+\ocwindent{2.00em}
+$\mid{}~([\,],~\ocwlowerid{\_})~\rightarrow{}~[\,]$\ocweol
+\ocwindent{2.00em}
+$\mid{}~(\ocwlowerid{\_},~[\,])~\rightarrow{}~\ocwlowerid{e}$\ocweol
+\ocwindent{2.00em}
+$\mid{}~(\ocwlowerid{x}::\ocwlowerid{xs},~\ocwlowerid{y}::\ocwlowerid{ys})~\rightarrow{}~$\ocwkw{if}~$\ocwlowerid{x}~<~\ocwlowerid{y}~$\ocwkw{then}~$\ocwlowerid{x}::(\ocwlowerid{set\_difference}~\ocwlowerid{xs}~(\ocwlowerid{y}::\ocwlowerid{ys}))$\ocweol
+\ocwindent{12.00em}
+\ocwkw{else}~\ocwkw{if}~$\ocwlowerid{x}~=~\ocwlowerid{y}~$\ocwkw{then}~$\ocwlowerid{set\_difference}~\ocwlowerid{xs}~\ocwlowerid{ys}$\ocweol
+\ocwindent{14.50em}
+\ocwkw{else}~$\ocwlowerid{set\_difference}~(\ocwlowerid{x}::\ocwlowerid{xs})~\ocwlowerid{ys}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:5697}%
+Mélange aléatoire d'un tableau avec l'algo de Knuth-Fisher-Yates,
+   appliqué à la génération d'une permutation aléatoire.
+
+\ocweol
+\ocwindent{0.00em}
+Mélange sur place, modifie le tableau.
+
+\ocweol
+\label{Permutation.ml:5879}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{shuffle}~\ocwlowerid{t}~=$\ocweol
+\ocwindent{1.00em}
+$\ocwupperid{Random.}\ocwlowerid{self\_init}~();$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{swap}~\ocwlowerid{i}~\ocwlowerid{j}~=~$\ocwkw{let}~$\ocwlowerid{temp}~=~\ocwlowerid{t}.(\ocwlowerid{i})~$\ocwkw{in}\ocweol
+\ocwindent{8.50em}
+$\ocwlowerid{t}.(\ocwlowerid{i})~\leftarrow{}~\ocwlowerid{t}.(\ocwlowerid{j});$\ocweol
+\ocwindent{8.50em}
+$\ocwlowerid{t}.(\ocwlowerid{j})~\leftarrow{}~\ocwlowerid{temp}$\ocweol
+\ocwindent{1.00em}
+\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{t}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~\ocwlowerid{n}-1~$\ocwkw{downto}~0~\ocwkw{do}\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{swap}~\ocwlowerid{i}~(\ocwupperid{Random.}\ocwlowerid{int}~(\ocwlowerid{i}+1));$\ocweol
+\ocwindent{1.00em}
+\ocwkw{done};\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{t}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Renvoie une permutation aléatoire.
+
+\ocweol
+\label{Permutation.ml:6152}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{random\_permutation}~\ocwlowerid{n}~=~\ocwlowerid{shuffle}~(\ocwlowerid{make\_id}~\ocwlowerid{n})$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Permutation.ml:6204}%
+Fonction d'affichage d'une permutation.
+
+\ocweol
+\label{Permutation.ml:6249}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{print\_permutation}~\ocwlowerid{p}~=$\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{print\_string}~$\ocwstring{"["};\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{print\_int}~\ocwlowerid{p}.(0);$\ocweol
+\ocwindent{1.00em}
+\ocwkw{for}~$\ocwlowerid{i}=1~$\ocwkw{to}~$\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{p}~-~1~$\ocwkw{do}\ocweol
+\ocwindent{2.00em}
+$\ocwupperid{Printf.}\ocwlowerid{printf}~$\ocwstring{"\ocwvspace{}\%d"}~$\ocwlowerid{p}.(\ocwlowerid{i});$\ocweol
+\ocwindent{1.00em}
+\ocwkw{done};\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{print\_string}~$\ocwstring{"]"}\ocweol
+\ocwendcode{}\end{document}

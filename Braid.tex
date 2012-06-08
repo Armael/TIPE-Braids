@@ -1,0 +1,115 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[headings]{fullpage}
+\usepackage{ocamlweb}
+\pagestyle{headings}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This file has been automatically generated with the command
+%% ocamlweb --header --no-index Braid.ml -o Braid.tex 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\typeout{OcamlWeb file Braid.ml}
+\ocwmodule{Braid}
+\allowbreak\ocwsection
+\label{Braid.ml:0}%
+Type décrivant une tresse d'après la liste de ses générateurs
+   dans la présentation d'Artin, et son nombre de brins (champ size)
+
+\ocweol
+\label{Braid.ml:240}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{type}~$\ocwlowerid{braid}~=~\{\ocwlowerid{word}~:~$\ocwbt{int}~\ocwbt{list};~$\ocwlowerid{size}~:~$\ocwbt{int}\}\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Braid.ml:288}%
+Inverse une tresse dans Bn en prenant les opposés des générateurs dans l'ordre
+   inverse
+
+\ocweol
+\label{Braid.ml:386}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{inv}~\ocwlowerid{braid}~=~\{\ocwlowerid{word}~=~\ocwupperid{List.}\ocwlowerid{map}~($\ocwkw{fun}~$\ocwlowerid{x}~\rightarrow{}~-\ocwlowerid{x})~(\ocwupperid{List.}\ocwlowerid{rev}~\ocwlowerid{braid.}\ocwlowerid{word});~\ocwlowerid{size}~=~\ocwlowerid{braid.}\ocwlowerid{size}\}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Braid.ml:478}%
+Concaténation de deux mots de tresses
+
+\ocweol
+\label{Braid.ml:522}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{concat}~\ocwlowerid{b1}~\ocwlowerid{b2}~=~\{\ocwlowerid{word}~=~\ocwlowerid{b1.}\ocwlowerid{word}~@~\ocwlowerid{b2.}\ocwlowerid{word};~\ocwlowerid{size}~=~\ocwlowerid{max}~\ocwlowerid{b1.}\ocwlowerid{size}~\ocwlowerid{b2.}\ocwlowerid{size}\}$\ocweol
+\ocwindent{0.00em}
+\ocwkw{let}~$(++)~=~\ocwlowerid{concat}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Braid.ml:619}%
+Fonction utilitaire retournant le type braid correspondant au mot (et à la taille
+   optionnelle) fourni
+
+\ocweol
+\label{Braid.ml:730}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{make\_braid}~?(\ocwlowerid{size}~=~-1)~\ocwlowerid{w}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{s}~=~($\ocwkw{if}~$\ocwlowerid{size}~=~-1~$\ocwkw{then}~1~+~$\ocwupperid{List.}\ocwlowerid{fold\_left}~($\ocwkw{fun}~$\ocwlowerid{a}~\ocwlowerid{x}~\rightarrow{}~\ocwlowerid{max}~\ocwlowerid{a}~(\ocwlowerid{abs}~\ocwlowerid{x}))~0~\ocwlowerid{w}$\ocweol
+\ocwindent{13.00em}
+\ocwkw{else}~$\ocwlowerid{size})~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\{$\ocwlowerid{word}~=~\ocwlowerid{w};~\ocwlowerid{size}~=~\ocwlowerid{s}\}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Braid.ml:913}%
+Génération de tresses aléatoires
+
+\ocweol
+\label{Braid.ml:954}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{random\_braid}~\ocwlowerid{n}~\ocwlowerid{l}~=$\ocweol
+\ocwindent{2.00em}
+$\ocwupperid{Random.}\ocwlowerid{self\_init}~();$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{w}~=~$\ocwbt{ref}~$[\,]~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~0~$\ocwkw{to}~$\ocwlowerid{l}-1~$\ocwkw{do}\ocweol
+\ocwindent{4.00em}
+$\ocwlowerid{w}~:=~(($\ocwkw{if}~$\ocwupperid{Random.}\ocwlowerid{bool}~()~$\ocwkw{then}~-1~\ocwkw{else}~1$)\times{}$\ocweol
+\ocwindent{7.00em}
+$(\ocwupperid{Random.}\ocwlowerid{int}~(\ocwlowerid{n}-1)~+~1))::!\ocwlowerid{w}$\ocweol
+\ocwindent{2.00em}
+\ocwkw{done};\ocweol
+\ocwindent{2.00em}
+\{$\ocwlowerid{word}~=~!\ocwlowerid{w};~\ocwlowerid{size}~=~\ocwlowerid{n}\}$\medskip
+
+\label{Braid.ml:1179}%
+\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{random\_lower\_braid}~\ocwlowerid{n}~\ocwlowerid{l}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{b}~=~\ocwlowerid{random\_braid}~(\ocwlowerid{n}/2-1)~\ocwlowerid{l}~$\ocwkw{in}\ocweol
+\ocwindent{3.00em}
+\{$\ocwlowerid{word}~=~\ocwlowerid{b.}\ocwlowerid{word};~\ocwlowerid{size}~=~\ocwlowerid{n}\}$\medskip
+
+\label{Braid.ml:1281}%
+\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{random\_upper\_braid}~\ocwlowerid{n}~\ocwlowerid{l}~=$\ocweol
+\ocwindent{2.00em}
+$\ocwupperid{Random.}\ocwlowerid{self\_init}~();$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{w}~=~$\ocwbt{ref}~$[\,]~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{for}~$\ocwlowerid{i}~=~0~$\ocwkw{to}~$\ocwlowerid{l}-1~$\ocwkw{do}\ocweol
+\ocwindent{4.00em}
+$\ocwlowerid{w}~:=~(($\ocwkw{if}~$\ocwupperid{Random.}\ocwlowerid{bool}~()~$\ocwkw{then}~-1~\ocwkw{else}~1$)\times{}~$\ocweol
+\ocwindent{7.00em}
+$(\ocwupperid{Random.}\ocwlowerid{int}~((\ocwlowerid{n}/2)-1)~+~(\ocwlowerid{n}/2)~+~1))::!\ocwlowerid{w}$\ocweol
+\ocwindent{2.00em}
+\ocwkw{done};\ocweol
+\ocwindent{2.00em}
+\{$\ocwlowerid{word}~=~!\ocwlowerid{w};~\ocwlowerid{size}~=~\ocwlowerid{n}\}$\ocweol
+\ocwendcode{}\end{document}

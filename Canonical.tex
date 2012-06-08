@@ -1,0 +1,416 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[headings]{fullpage}
+\usepackage{ocamlweb}
+\pagestyle{headings}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This file has been automatically generated with the command
+%% ocamlweb --header --no-index Canonical.ml -o Canonical.tex 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\typeout{OcamlWeb file Canonical.ml}
+\ocwmodule{Canonical}
+\allowbreak\ocwsection
+\label{Canonical.ml:0}%
+\label{Canonical.ml:97}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{module}~$\ocwupperid{P}~=~\ocwupperid{Permutation}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Type décrivant une tresse représentée sous la forme $\Delta^r A_1...A_n$ où
+   $A_1,...,A_n$ sont des tresses simples. Les tresses simples sont ici décrites
+   par leurs permutations associées.
+
+\ocweol
+\label{Canonical.ml:330}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{type}~$\ocwlowerid{braid\_permlist}~=~\{\ocwlowerid{bpl\_size}~:~$\ocwbt{int};~$\ocwlowerid{delta\_power}~:~$\ocwbt{int};~$\ocwlowerid{permlist}~:~\ocwupperid{P.}\ocwlowerid{permutation}~$\ocwbt{list}\}\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Tresses de base : $\Delta$ et la tresse vide
+
+\ocweol
+\label{Canonical.ml:473}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{delta}~\ocwlowerid{n}~=~\{\ocwlowerid{bpl\_size}~=~\ocwlowerid{n};~\ocwlowerid{delta\_power}~=~1;~\ocwlowerid{permlist}~=~[\,]\}$\medskip
+
+\label{Canonical.ml:536}%
+\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{empty}~\ocwlowerid{n}~=~\{\ocwlowerid{bpl\_size}~=~\ocwlowerid{n};~\ocwlowerid{delta\_power}~=~0;~\ocwlowerid{permlist}~=~[\,]\}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:602}%
+Conversion d'une tresse décrit par un mot sur l'alphabet des générateurs
+   en une représentation sous forme de liste de permutations.
+   
+   Algorithme : Si l'on rencontre un $\sigma _i$ alors on ajoute à la liste des
+   permutations la transposition correspondante.
+   Si l'on rencontre un ${\sigma _i}^{-1}$, on utilise le fait que
+   ${\sigma _i}^{-1} = \Delta^{-1} \Delta {\sigma _i}^{-1}$ et que $\Delta {\sigma _i}^{-1}$
+   est une tresse positive. On l'ajoute à la liste et on fait remonter le $\Delta^{-1}$
+   en composant par $\tau$ .
+   
+   On simplifie les calculs en se rappelant que $\tau^2 = id$.
+
+\ocweol
+\label{Canonical.ml:1226}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{get\_permlist\_decomposition}~(\ocwlowerid{b}~:~\ocwupperid{Braid.}\ocwlowerid{braid})~=~$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwlowerid{b.Braid.}\ocwlowerid{size}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwbc{} Calcule $\Delta \times \sigma^{-1}$ que l'on sait être un facteur canonique \ocwec{}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{delta}~=~\ocwupperid{P.}\ocwlowerid{make\_delta}~\ocwlowerid{n}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{neg\_to\_perm}~\ocwlowerid{x}~=~\ocwupperid{P.}\ocwlowerid{compose\_transpose\_left}~\ocwlowerid{delta}~(-\ocwlowerid{x}-1)~(-\ocwlowerid{x})~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwbc{} Applique l'algorithme, en mémorisant la puissance de $\tau$ à appliquer \ocwec{}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$(\ocwlowerid{delta\_pow},~\ocwlowerid{perm\_stack})~=~$\ocweol
+\ocwindent{4.00em}
+$\ocwupperid{List.}\ocwlowerid{fold\_left}~($\ocwkw{fun}~$(\ocwlowerid{delta\_pow},~\ocwlowerid{perm\_stack})~\ocwlowerid{x}~\rightarrow{}$\ocweol
+\ocwindent{13.00em}
+\ocwkw{if}~$\ocwlowerid{x}~>~0~$\ocwkw{then}\ocweol
+\ocwindent{14.00em}
+$(\ocwlowerid{delta\_pow},~$\ocweol
+\ocwindent{14.00em}
+$(\ocwupperid{P.}\ocwlowerid{make\_transpose}~(\ocwlowerid{x}-1)~\ocwlowerid{x}~\ocwlowerid{n},~0)::\ocwlowerid{perm\_stack})$\ocweol
+\ocwindent{13.00em}
+\ocwkw{else}\ocweol
+\ocwindent{14.00em}
+$(\ocwlowerid{delta\_pow}~-~1,$\ocweol
+\ocwindent{14.50em}
+$(\ocwlowerid{neg\_to\_perm}~\ocwlowerid{x},~0)::$\ocweol
+\ocwindent{14.50em}
+$(\ocwupperid{List.}\ocwlowerid{map}~($\ocwkw{fun}~$(\ocwlowerid{p},~\ocwlowerid{tau\_pow})~\rightarrow{}~(\ocwlowerid{p},~\ocwlowerid{tau\_pow}~+~1))~\ocwlowerid{perm\_stack})))$\ocweol
+\ocwindent{11.50em}
+$(0,~[\,])~\ocwlowerid{b.Braid.}\ocwlowerid{word}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwbc{} On applique la puissance de $\tau$ si nécessaire \ocwec{}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{perm\_list}~=$\ocweol
+\ocwindent{4.00em}
+$\ocwupperid{List.}\ocwlowerid{rev\_map}~($\ocwkw{fun}~$(\ocwlowerid{perm},~\ocwlowerid{tau\_pow})~\rightarrow{}~$\ocwkw{if}~$(\ocwlowerid{tau\_pow}~$\ocwkw{mod}~2$)~\not=~0$\ocweol
+\ocwindent{24.00em}
+\ocwkw{then}~$\ocwupperid{P.}\ocwlowerid{tau}~\ocwlowerid{perm}$\ocweol
+\ocwindent{24.00em}
+\ocwkw{else}~$\ocwlowerid{perm})$\ocweol
+\ocwindent{10.50em}
+$\ocwlowerid{perm\_stack}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\{$\ocwlowerid{bpl\_size}~=~\ocwlowerid{n};~\ocwlowerid{delta\_power}~=~\ocwlowerid{delta\_pow};~\ocwlowerid{permlist}~=~\ocwlowerid{perm\_list}\}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:2470}%
+Mise sous forme maximale à gauche (left-weighted) d'une liste de permutations (et non
+   d'une tresse complète : voir canonicize pour celà).
+   
+   Algorithme : On considère tour à tour des couples de tresses simples. On calcule alors
+   le «finishing set» de la première et le «starting set» de la seconde. On fait la 
+   différence ensembliste entre le «starting set» et le «finishing set» et l'on ajoute
+   les éléments de la différence à la première tresse, et on les retire de la deuxième
+   (concrètement, une composition de permutations).
+
+\ocweol
+\label{Canonical.ml:3044}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{make\_left\_weighted}~\ocwlowerid{start\_pl}~=$\medskip
+
+\label{Canonical.ml:3079}%
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{continue}~=~$\ocwbt{ref}~\ocwkw{true}~\ocwkw{in}\medskip
+
+\ocwendcode{}\ocwindent{1.00em}
+trouver la décomposition maximale à gauche de $A_1 A_2$,
+     de permutations associées respectives p1 et p2 
+\ocweol
+\label{Canonical.ml:3231}%
+\medskip
+\ocwbegincode{}\ocwindent{1.00em}
+\ocwkw{let}~\ocwkw{rec}~$\ocwlowerid{make\_lw\_pair}~\ocwlowerid{p1}~\ocwlowerid{p2}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{s2}~=~\ocwupperid{P.}\ocwlowerid{starting\_set}~\ocwlowerid{p2}~$\ocwkw{and}~$\ocwlowerid{f1}~=~\ocwupperid{P.}\ocwlowerid{finishing\_set}~\ocwlowerid{p1}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{if}~$\ocwlowerid{s2}~=~[\,]~$\ocwbc{} p2 = id \ocwec{}~\ocwkw{then}~$[\ocwlowerid{p1}]$\ocweol
+\ocwindent{2.00em}
+\ocwkw{else}~\ocwkw{if}~$\ocwlowerid{f1}~=~[\,]~$\ocwbc{} p1 = id \ocwec{}~\ocwkw{then}~$[\ocwlowerid{p2}]~$\ocwbc{} peu probable \ocwec{}\ocweol
+\ocwindent{2.00em}
+\ocwkw{else}~\ocwkw{match}~$\ocwupperid{P.}\ocwlowerid{set\_difference}~\ocwlowerid{s2}~\ocwlowerid{f1}~$\ocwkw{with}\ocweol
+\ocwindent{3.00em}
+$\mid{}~[\,]~\rightarrow{}~[\ocwlowerid{p1};~\ocwlowerid{p2}]~$\ocwbc{} p1 facteur maximal \ocwec{}\ocweol
+\ocwindent{3.00em}
+$\mid{}~\ocwlowerid{i}::\ocwlowerid{\_}~\rightarrow{}~\ocwlowerid{continue}~:=~$\ocwkw{true};\ocweol
+\ocwindent{8.00em}
+\ocwkw{let}~$\ocwlowerid{p1'}~=~\ocwupperid{P.}\ocwlowerid{compose\_transpose\_left}~\ocwlowerid{p1}~(\ocwlowerid{i}-1)~\ocwlowerid{i}~$\ocwkw{in}\ocweol
+\ocwindent{8.00em}
+\ocwkw{let}~$\ocwlowerid{p2'}~=~\ocwupperid{P.}\ocwlowerid{compose\_transpose\_right}~\ocwlowerid{p2}~(\ocwlowerid{i}-1)~\ocwlowerid{i}~$\ocwkw{in}\ocweol
+\ocwindent{8.00em}
+$\ocwlowerid{make\_lw\_pair}~\ocwlowerid{p1'}~\ocwlowerid{p2'}$\ocweol
+\ocwindent{1.00em}
+\ocwkw{in}\medskip
+
+\label{Canonical.ml:3700}%
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{make\_lw\_pair'}~\ocwlowerid{p1}~\ocwlowerid{p2}~=$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{b}~=~\ocwupperid{P.}\ocwlowerid{meet}~(\ocwupperid{P.}\ocwlowerid{compose}~(\ocwupperid{P.}\ocwlowerid{inv}~\ocwlowerid{p1})~(\ocwupperid{P.}\ocwlowerid{make\_delta}~(\ocwupperid{Array.}\ocwlowerid{length}~\ocwlowerid{p1})))~\ocwlowerid{p2}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{if}~$\lnot{}~(\ocwupperid{P.}\ocwlowerid{is\_id}~\ocwlowerid{b})~$\ocwkw{then}~$($\ocweol
+\ocwindent{3.00em}
+$\ocwlowerid{continue}~:=~$\ocwkw{true};\ocweol
+\ocwindent{3.00em}
+$\ocwupperid{List.}\ocwlowerid{filter}~($\ocwkw{fun}~$\ocwlowerid{x}~\rightarrow{}~\lnot{}~(\ocwupperid{P.}\ocwlowerid{is\_id}~\ocwlowerid{x}))~[\ocwupperid{P.}\ocwlowerid{compose}~\ocwlowerid{p1}~\ocwlowerid{b};~\ocwupperid{P.}\ocwlowerid{compose}~(\ocwupperid{P.}\ocwlowerid{inv}~\ocwlowerid{b})~\ocwlowerid{p2}]$\ocweol
+\ocwindent{2.00em}
+$)~$\ocwkw{else}~$($\ocweol
+\ocwindent{3.00em}
+$\ocwupperid{List.}\ocwlowerid{filter}~($\ocwkw{fun}~$\ocwlowerid{x}~\rightarrow{}~\lnot{}~(\ocwupperid{P.}\ocwlowerid{is\_id}~\ocwlowerid{x}))~[\ocwlowerid{p1};~\ocwlowerid{p2}]$\ocweol
+\ocwindent{2.00em}
+$)$\ocweol
+\ocwindent{1.00em}
+\ocwkw{in}\medskip
+
+\ocwendcode{}\ocwindent{1.00em}
+On réduit la liste des facteurs à partir de la fin 
+\ocweol
+\label{Canonical.ml:4089}%
+\medskip
+\ocwbegincode{}\ocwindent{1.00em}
+\ocwkw{let}~\ocwkw{rec}~$\ocwlowerid{reduce}~=~$\ocwkw{function}\ocweol
+\ocwindent{2.00em}
+$\mid{}~[\,]~\rightarrow{}~[\,]$\ocweol
+\ocwindent{2.00em}
+$\mid{}~\ocwlowerid{p1}::\ocwlowerid{q}~\rightarrow{}~$\ocwkw{match}~$\ocwlowerid{reduce}~\ocwlowerid{q}~$\ocwkw{with}\ocweol
+\ocwindent{4.00em}
+$\mid{}~[\,]~\rightarrow{}~[\ocwlowerid{p1}]$\ocweol
+\ocwindent{4.00em}
+$\mid{}~\ocwlowerid{p2}::\ocwlowerid{q'}~\rightarrow{}~\ocwlowerid{make\_lw\_pair'}~\ocwlowerid{p1}~\ocwlowerid{p2}~@~\ocwlowerid{q'}$\ocweol
+\ocwindent{1.00em}
+\ocwkw{in}\medskip
+
+\label{Canonical.ml:4227}%
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{current\_pl}~=~$\ocwbt{ref}~$\ocwlowerid{start\_pl}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{while}~!$\ocwlowerid{continue}~$\ocwkw{do}\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{continue}~:=~$\ocwkw{false};\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{current\_pl}~:=~\ocwlowerid{reduce}~!\ocwlowerid{current\_pl}$\ocweol
+\ocwindent{1.00em}
+\ocwkw{done};\ocweol
+\ocwindent{1.00em}
+!$\ocwlowerid{current\_pl}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:4371}%
+Met une tresse décrite sous forme de liste de permutations sous forme canonique.
+   
+   Algorithme : Rend la liste de tresses simples maximale à gauche, et collecte
+   les tresses simples égales à $\Delta$ en tête de liste (s'il y a un $\Delta$, il
+   est forcément en tête de liste). Incrémente le champ delta\_power en conséquence.
+
+\ocweol
+\label{Canonical.ml:4720}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{canonicize}~\ocwlowerid{bpl}~=$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{dp}~=~$\ocwbt{ref}~$\ocwlowerid{bpl.}\ocwlowerid{delta\_power}~$\ocweol
+\ocwindent{1.00em}
+\ocwkw{and}~$\ocwlowerid{pl}~=~$\ocwbt{ref}~$(\ocwlowerid{make\_left\_weighted}~\ocwlowerid{bpl.}\ocwlowerid{permlist})$\ocweol
+\ocwindent{1.00em}
+\ocwkw{and}~$\ocwlowerid{ok}~=~$\ocwbt{ref}~\ocwkw{false}~\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{while}~$\lnot{}~!\ocwlowerid{ok}~\land{}~!\ocwlowerid{pl}~\not=~[\,]~$\ocwkw{do}\ocweol
+\ocwindent{2.00em}
+\ocwkw{if}~$\ocwupperid{P.}\ocwlowerid{is\_delta}~(\ocwupperid{List.}\ocwlowerid{hd}~!\ocwlowerid{pl})~$\ocwkw{then}~$($\ocweol
+\ocwindent{3.00em}
+$\ocwlowerid{dp}~:=~!\ocwlowerid{dp}~+~1;$\ocweol
+\ocwindent{3.00em}
+$\ocwlowerid{pl}~:=~\ocwupperid{List.}\ocwlowerid{tl}~!\ocwlowerid{pl}$\ocweol
+\ocwindent{2.00em}
+$)~$\ocwkw{else}~$($\ocweol
+\ocwindent{3.00em}
+$\ocwlowerid{ok}~:=~$\ocwkw{true}\ocweol
+\ocwindent{2.00em}
+$)$\ocweol
+\ocwindent{1.00em}
+\ocwkw{done};\ocweol
+\ocwindent{1.00em}
+\{$\ocwlowerid{bpl\_size}~=~\ocwlowerid{bpl.}\ocwlowerid{bpl\_size};~\ocwlowerid{delta\_power}~=~!\ocwlowerid{dp};~\ocwlowerid{permlist}~=~!\ocwlowerid{pl}\}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Met une tresse décrite par un mot de tresse sous forme canonique.
+
+\ocweol
+\label{Canonical.ml:5147}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{canonical\_form}~\ocwlowerid{b}~=~\ocwlowerid{canonicize}~(\ocwlowerid{get\_permlist\_decomposition}~\ocwlowerid{b})$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:5218}%
+Tests d'égalité.
+
+   Revient à mettre sous forme canonique, et les comparer.
+
+\ocweol
+\label{Canonical.ml:5304}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{braids\_equal}~\ocwlowerid{b1}~\ocwlowerid{b2}~=~(\ocwlowerid{canonical\_form}~\ocwlowerid{b1})~=~(\ocwlowerid{canonical\_form}~\ocwlowerid{b2})$\medskip
+
+\label{Canonical.ml:5373}%
+\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{permlists\_equal}~\ocwlowerid{bpl1}~\ocwlowerid{bpl2}~=~(\ocwlowerid{canonicize}~\ocwlowerid{bpl1})~=~(\ocwlowerid{canonicize}~\ocwlowerid{bpl2})$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:5448}%
+Opérations algébriques sur les tresses sous forme de listes de permutations.
+
+\ocweol
+\ocwindent{0.00em}
+Produit.
+
+   Formule : $(\Delta^p A_1...A_l)(\Delta^q B_1...B_l') =
+               \Delta^{p+q} \tau^q(A_1)...\tau^q(A_l) B_1...B_l$
+
+\ocweol
+\label{Canonical.ml:5673}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{product}~\ocwlowerid{a}~\ocwlowerid{b}~=$\ocweol
+\ocwindent{1.00em}
+\{$\ocwlowerid{bpl\_size}~=~\ocwlowerid{a.}\ocwlowerid{bpl\_size};$\ocweol
+\ocwindent{1.50em}
+$\ocwlowerid{delta\_power}~=~\ocwlowerid{a.}\ocwlowerid{delta\_power}~+~\ocwlowerid{b.}\ocwlowerid{delta\_power};$\ocweol
+\ocwindent{1.50em}
+$\ocwlowerid{permlist}~=~($\ocwkw{if}~$\ocwlowerid{b.}\ocwlowerid{delta\_power}~$\ocwkw{mod}~2~$\not=~0~$\ocwkw{then}~$\ocwupperid{List.}\ocwlowerid{map}~\ocwupperid{P.}\ocwlowerid{tau}~\ocwlowerid{a.}\ocwlowerid{permlist}~$\ocwkw{else}~$\ocwlowerid{a.}\ocwlowerid{permlist})$\ocweol
+\ocwindent{7.00em}
+@~$\ocwlowerid{b.}\ocwlowerid{permlist}~\}$\medskip
+
+\label{Canonical.ml:5888}%
+\ocwindent{0.00em}
+\ocwkw{let}~$(\ensuremath{<}*\ensuremath{>})~=~\ocwlowerid{product}$\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Inverse.
+
+   Formule : $(\Delta^r A_1...A_l)^{-1} =
+               \Delta^{-r-l} \tau^{-r-l}(A'_l)...\tau^{-r-1}(A'_1)$
+   avec $A'_i = A_i^{-1} \Delta$ en voyant $\Delta$ et $A_i$ en tant que permutations (??)
+
+\ocweol
+\label{Canonical.ml:6133}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{inverse}~\ocwlowerid{b}~=$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{l}~=~\ocwupperid{List.}\ocwlowerid{length}~\ocwlowerid{b.}\ocwlowerid{permlist}~$\ocwkw{and}~$\ocwlowerid{q}~=~\ocwlowerid{b.}\ocwlowerid{delta\_power}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$\ocwlowerid{delta}~=~\ocwupperid{P.}\ocwlowerid{make\_delta}~\ocwlowerid{b.}\ocwlowerid{bpl\_size}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~$(\ocwlowerid{\_},~\ocwlowerid{pl'})~=$\ocweol
+\ocwindent{2.00em}
+$\ocwupperid{List.}\ocwlowerid{fold\_left}~($\ocwkw{fun}~$(\ocwlowerid{parity},~\ocwlowerid{acc})~\ocwlowerid{p}~\rightarrow{}$\ocweol
+\ocwindent{11.00em}
+\ocwkw{let}~$\ocwlowerid{p'}~=~\ocwupperid{P.}\ocwlowerid{compose}~(\ocwupperid{P.}\ocwlowerid{inv}~\ocwlowerid{p})~\ocwlowerid{delta}~$\ocwkw{in}\ocweol
+\ocwindent{11.00em}
+$((\ocwlowerid{parity}~+~1)~$\ocwkw{mod}~2,\ocweol
+\ocwindent{11.50em}
+$($\ocwkw{if}~$\ocwlowerid{parity}~=~0~$\ocwkw{then}~$\ocwlowerid{p'}::\ocwlowerid{acc}~$\ocwkw{else}~$(\ocwupperid{P.}\ocwlowerid{tau}~\ocwlowerid{p'})::\ocwlowerid{acc})))$\ocweol
+\ocwindent{9.50em}
+$((\ocwlowerid{abs}~\ocwlowerid{q})~$\ocwkw{mod}~2,~$[\,])~\ocwlowerid{b.}\ocwlowerid{permlist}~$\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\{~$\ocwlowerid{bpl\_size}~=~\ocwlowerid{b.}\ocwlowerid{bpl\_size};$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{delta\_power}~=~-~\ocwlowerid{q}~-~\ocwlowerid{l};$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{permlist}~=~\ocwlowerid{pl'}$\ocweol
+\ocwindent{1.00em}
+\}\medskip
+
+\ocwendcode{}\ocwindent{0.00em}
+Conjugué.
+
+   Conjugué de A par B : $B^{-1} A B$
+
+\ocweol
+\label{Canonical.ml:6677}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{conjugate}~\ocwlowerid{a}~\ocwlowerid{b}~=~(\ocwlowerid{inverse}~\ocwlowerid{b})~\ensuremath{<}*\ensuremath{>}~\ocwlowerid{a}~\ensuremath{<}*\ensuremath{>}~\ocwlowerid{b}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:6726}%
+Convertit une tresse sous forme canonique en sa permutation 
+    correspondante.
+    Il s'agit d'un antimorphisme (souvent noté $\pi$).
+
+\ocweol
+\label{Canonical.ml:6869}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{braid2perm}~\ocwlowerid{b}~=~$\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{n}~=~\ocwlowerid{b.}\ocwlowerid{bpl\_size}~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{perm}~=~($\ocwkw{if}~$\ocwlowerid{b.}\ocwlowerid{delta\_power}~$\ocwkw{mod}~2~=~0~\ocwkw{then}\ocweol
+\ocwindent{10.00em}
+$\ocwupperid{P.}\ocwlowerid{make\_id}~\ocwlowerid{n}$\ocweol
+\ocwindent{8.00em}
+\ocwkw{else}\ocweol
+\ocwindent{10.00em}
+$\ocwupperid{P.}\ocwlowerid{make\_delta}~\ocwlowerid{n}$\ocweol
+\ocwindent{7.50em}
+$)~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+\ocwkw{let}~$\ocwlowerid{temp}~=~\ocwupperid{Array.}\ocwlowerid{make}~\ocwlowerid{n}~0~$\ocwkw{in}\ocweol
+\ocwindent{2.00em}
+$\ocwupperid{List.}\ocwlowerid{iter}~($\ocwkw{fun}~$\ocwlowerid{p}~\rightarrow{}~\ocwupperid{P.}\ocwlowerid{compose}~$\~{}$\ocwlowerid{dest}:\ocwlowerid{temp}~\ocwlowerid{p}~\ocwlowerid{perm};~\ocwupperid{Array.}\ocwlowerid{blit}~\ocwlowerid{temp}~0~\ocwlowerid{perm}~0~\ocwlowerid{n})~\ocwlowerid{b.}\ocwlowerid{permlist};$\ocweol
+\ocwindent{2.00em}
+$\ocwlowerid{perm}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:7211}%
+Génère une tresse sous forme de liste de permutations aléatoire.
+   À appeler avec l = DOUZE, n de l'ordre de 80 (en gros, $10^{1\ ou \ 2}$)
+
+\ocweol
+\label{Canonical.ml:7362}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{random\_braid\_sequence}~\ocwlowerid{n}~\ocwlowerid{l}~=$\ocweol
+\ocwindent{1.00em}
+\ocwkw{let}~\ocwkw{rec}~$\ocwlowerid{loop}~\ocwlowerid{acc}~=~$\ocwkw{function}\ocweol
+\ocwindent{2.00em}
+$\mid{}~0~\rightarrow{}~\ocwlowerid{acc}$\ocweol
+\ocwindent{2.00em}
+$\mid{}~\ocwlowerid{i}~\rightarrow{}~\ocwlowerid{loop}~(\ocwupperid{P.}\ocwlowerid{random\_permutation}~\ocwlowerid{n}~::~\ocwlowerid{acc})~(\ocwlowerid{i}-1)$\ocweol
+\ocwindent{1.00em}
+\ocwkw{in}\ocweol
+\ocwindent{1.00em}
+\{$\ocwlowerid{bpl\_size}~=~\ocwlowerid{n};~\ocwlowerid{delta\_power}~=~\ocwlowerid{l}-(\ocwupperid{Random.}\ocwlowerid{int}~(3\times{}\ocwlowerid{l}));~$\ocwbc{} tout à fait arbitraire \ocwec{}\ocweol
+\ocwindent{1.50em}
+$\ocwlowerid{permlist}~=~\ocwlowerid{loop}~[\,]~\ocwlowerid{l}\}$\ocweol
+\ocwendcode{}\allowbreak\ocwsection
+\label{Canonical.ml:7611}%
+Affiche une tresse sous forme de permlist : (delta\_power | Permutations)
+
+\ocweol
+\label{Canonical.ml:7691}%
+\medskip
+\ocwbegincode{}\ocwindent{0.00em}
+\ocwkw{let}~$\ocwlowerid{print\_braid\_permlist}~\ocwlowerid{bpl}~=$\ocweol
+\ocwindent{1.00em}
+$\ocwupperid{Printf.}\ocwlowerid{printf}~$\ocwstring{"(\%d\ocwvspace{}|\ocwvspace{}"}~$\ocwlowerid{bpl.}\ocwlowerid{delta\_power};$\ocweol
+\ocwindent{1.00em}
+$\ocwupperid{List.}\ocwlowerid{iter}~($\ocwkw{fun}~$\ocwlowerid{p}~\rightarrow{}~\ocwupperid{P.}\ocwlowerid{print\_permutation}~\ocwlowerid{p};~\ocwlowerid{print\_string}~$\ocwstring{"\ocwvspace{}"}$)~\ocwlowerid{bpl.}\ocwlowerid{permlist};$\ocweol
+\ocwindent{1.00em}
+$\ocwlowerid{print\_string}~$\ocwstring{")"}\ocweol
+\ocwendcode{}\end{document}
