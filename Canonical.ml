@@ -101,7 +101,7 @@ let make_left_weighted start_pl =
     | [] -> []
     | p1::q -> match reduce q with
 	| [] -> [p1]
-	| p2::q' -> make_lw_pair' p1 p2 @ q'
+	| p2::q' -> make_lw_pair p1 p2 @ q'
   in
   
   let current_pl = ref start_pl in
