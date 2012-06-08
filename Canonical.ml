@@ -71,7 +71,7 @@ let make_left_weighted start_pl =
 
   let continue = ref true in
   
-  (* trouver la décomposition maximale à gauche de A_1 A_2,
+  (* trouver la décomposition maximale à gauche de $A_1 A_2$,
      de permutations associées respectives p1 et p2 *)
   let rec make_lw_pair p1 p2 =
     let s2 = P.starting_set p2 and f1 = P.finishing_set p1 in
